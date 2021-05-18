@@ -1,59 +1,97 @@
-#include <stdio.h>
-#include <math.h>
 #include <assert.h>
+#include <pthread.h>
+#include <spawn.h>
+#include <stdio.h>
 #include <stdlib.h>
-#include <sys/time.h>
 #include <time.h>
-#include <SDL2/SDL.h>
+#include <unistd.h>
 
-#define GRAVITY_CONST ((double) 9.8)
+#define handle_error(_msg)  \
+    do {                    \
+        perror(_msg);       \
+        exit(EXIT_FAILURE); \
+    } while (0);
 
-#ifndef M_PI
-#define M_PI 3.1415926535897932384626433832795
-#endif
+#define error_msg(_msg, ...)                \
+    do {                                    \
+        fprintf(stderr, _msg, __VA_ARGS__); \
+        exit(EXIT_FAILURE);                 \
+    } while (0);
 
-#define CONVERT_DEG_TO_RAD(_degrees) ((_degrees) / 180.0 * M_PI)
-#define CONVERT_RAD_TO_DEG(_radians) ((_radians) / M_PI * 180)
+static const char *empty_string = "";
 
-#define min(_x, _y) (((_x) < (_y)) ? (_x) : (_y))
-#define max(_x, _y) (((_x) > (_y)) ? (_x) : (_y))
+void print_info(const char *name, time_t start_time)
+{
+    struct tm *local_time;
+    local_time = localtime(&start_time);
 
-#define ERROR_EXIT(fmt, ...)                        \
-        do {                                        \
-            fprintf(stderr, fmt, ##__VA_ARGS__);    \
-            exit(-1);                               \
-        } while (0)
+    printf("Thread name:\t%s\n"
+           "PID:\t\t\t%d\n"
+           "TID:\t\t\t%lu\n"
+           "Start time: \t%s\n",
+           name, getpid(),
+           pthread_self(),
+           asctime(local_time));
+}
+
+void *thread_func1(void *name)
+{
+    pid_t pid;
+    posix_spawn_file_actions_t fileActions;
+    posix_spawnattr_t spawnattr;
+    time_t start_time = time(NULL);
+
+    assert(name != NULL);
+
+/*    if (posix_spawn_file_actions_init(&fileActions)) {
+        handle_error("posix_spawn_file_actions_init()");
+    }
+
+    if (posix_spawnattr_init(&spawnattr)) {
+        posix_spawn_file_actions_destroy(&fileActions);
+        handle_error("posix_spawnattr_init()");
+    }
+
+    if (posix_spawnp(&pid, "ls", &fileActions, &spawnattr, (char *const *) &empty_string,
+                     (char *const *) &empty_string)) {
+        posix_spawn_file_actions_destroy(&fileActions);
+        posix_spawnattr_destroy(&spawnattr);
+        handle_error("posix_spawnp()");
+    }*/
+
+    pid = fork();
+    if (!pid) {
+        print_info(name, start_time);
+    } else if (pid < 0) {
+        handle_error("fork()");
+    }
+
+    print_info(name, start_time);
+
+/*    posix_spawn_file_actions_destroy(&fileActions);
+    posix_spawnattr_destroy(&spawnattr);*/
+
+    pthread_exit(0);
+}
+
+void *thread_func2(void *name)
+{
+    time_t start_time = time(NULL);
+
+    assert(name != NULL);
+
+    print_info(name, start_time);
+
+    pthread_exit(0);
+}
 
 main()
 {
-    /* Initializing variables */
-    double b, R, m, L, H, alpha, beta, mu;
+    pthread_t ch1, ch2;
 
-    /* I/O flow */
-    printf("Type distance from tunnel right side:");
-    scanf("%lf", &b);
+    pthread_create(&ch1, NULL, thread_func1, "Thread1");
+    pthread_create(&ch2, NULL, thread_func2, "Thread2");
 
-    printf("Type radius of the ball:");
-    scanf("%lf", &R);
-
-    printf("Type mass of the ball:");
-    scanf("%lf", &m);
-
-    printf("Type width of the tunnel:");
-    scanf("%lf", &L);
-
-    printf("Type height of the tunnel:");
-    scanf("%lf", &H);
-
-    printf("Type tunnel angle (alpha):");
-    scanf("%lf", &alpha);
-
-    printf("Type ball angle (beta):");
-    scanf("%lf", &beta);
-
-    printf("Type friction coefficient: ");
-    scanf("%lf", &mu);
-
-    /* Main part */
-
+    pthread_join(ch1, 0);
+    pthread_join(ch2, 0);
 }
