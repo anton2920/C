@@ -18,69 +18,49 @@
         exit(EXIT_FAILURE);                 \
     } while (0);
 
-static const char *empty_string = "";
+#define TIMEBUF_SIZE 1024
 
-void print_info(const char *name, time_t start_time)
+void print_time(const char *supplement)
 {
-    struct tm *local_time;
-    local_time = localtime(&start_time);
+    char timebuf[TIMEBUF_SIZE] = {};
+    struct tm *lt;
+    time_t t;
 
+    assert(supplement != NULL);
+
+    t = time(NULL);
+    lt = localtime(&t);
+    strftime(timebuf, TIMEBUF_SIZE, "%T", lt);
+
+    printf("%s:\t\t%s\n", supplement, timebuf);
+}
+
+void print_info(const char *name)
+{
     printf("Thread name:\t%s\n"
-           "PID:\t\t\t%d\n"
-           "TID:\t\t\t%lu\n"
-           "Start time: \t%s\n",
-           name, getpid(),
-           pthread_self(),
-           asctime(local_time));
+           "TID:\t\t\t%lu\n",
+           name, pthread_self());
 }
 
-void *thread_func1(void *name)
+void print_dead(void)
 {
-    pid_t pid;
-    posix_spawn_file_actions_t fileActions;
-    posix_spawnattr_t spawnattr;
-    time_t start_time = time(NULL);
-
-    assert(name != NULL);
-
-/*    if (posix_spawn_file_actions_init(&fileActions)) {
-        handle_error("posix_spawn_file_actions_init()");
-    }
-
-    if (posix_spawnattr_init(&spawnattr)) {
-        posix_spawn_file_actions_destroy(&fileActions);
-        handle_error("posix_spawnattr_init()");
-    }
-
-    if (posix_spawnp(&pid, "ls", &fileActions, &spawnattr, (char *const *) &empty_string,
-                     (char *const *) &empty_string)) {
-        posix_spawn_file_actions_destroy(&fileActions);
-        posix_spawnattr_destroy(&spawnattr);
-        handle_error("posix_spawnp()");
-    }*/
-
-    pid = fork();
-    if (!pid) {
-        print_info(name, start_time);
-    } else if (pid < 0) {
-        handle_error("fork()");
-    }
-
-    print_info(name, start_time);
-
-/*    posix_spawn_file_actions_destroy(&fileActions);
-    posix_spawnattr_destroy(&spawnattr);*/
-
-    pthread_exit(0);
+    printf("Thread is dead!\n");
 }
 
-void *thread_func2(void *name)
+void print_pid(void)
 {
-    time_t start_time = time(NULL);
+    printf("PID:\t\t\t%d\n", getpid());
+}
 
+void *thread_func(void *name)
+{
     assert(name != NULL);
 
-    print_info(name, start_time);
+    print_time("Start time");
+    print_info(name);
+    print_pid();
+    print_time("End time");
+    print_dead();
 
     pthread_exit(0);
 }
@@ -88,10 +68,29 @@ void *thread_func2(void *name)
 main()
 {
     pthread_t ch1, ch2;
+    pid_t child_pid;
 
-    pthread_create(&ch1, NULL, thread_func1, "Thread1");
-    pthread_create(&ch2, NULL, thread_func2, "Thread2");
+    child_pid = fork();
 
-    pthread_join(ch1, 0);
-    pthread_join(ch2, 0);
+    if (!child_pid) {
+        system("pidin");
+
+        print_pid();
+        print_time("End time");
+        print_dead();
+    } else {
+        if (pthread_create(&ch1, NULL, thread_func, "Thread1")) {
+            handle_error("pthread_create()");
+        }
+        if (pthread_create(&ch2, NULL, thread_func, "Thread2")) {
+            handle_error("pthread_create()");
+        }
+
+        pthread_join(ch1, 0);
+        pthread_join(ch2, 0);
+
+        print_pid();
+        print_time("End time");
+        print_dead();
+    }
 }
