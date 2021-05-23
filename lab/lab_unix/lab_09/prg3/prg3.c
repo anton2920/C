@@ -22,13 +22,13 @@ _Noreturn static void *thread_func(void *_thread_num)
     size_t *thread_num = _thread_num;
     assert(thread_num != NULL);
 
-/*    pthread_mutex_lock(&mutex);
-    pthread_cond_wait(conds + *thread_num, &mutex);*/
+    pthread_mutex_lock(&mutex);
+    pthread_cond_wait(conds + *thread_num, &mutex);
 
     for (;;) {
         pthread_mutex_lock(&mutex);
 
-        printf("This tread: %lu; to wake: %ld\n", *thread_num, (*thread_num + 1) % (NT - 1));
+        printf("%lu\n", *thread_num);
         sleep(1);
 
         pthread_cond_signal(conds + ((*thread_num + 1) % (NT - 1)));
@@ -61,7 +61,7 @@ main()
         }
     }
 
-    /*pthread_cond_signal(&conds[thrd_indices[0]]);*/
+    pthread_cond_signal(&conds[thrd_indices[0]]);
 
     for (i = 0; i < sizeof(thrd_array) / sizeof(thrd_array[0]); ++i) {
         if (pthread_join(*(thrd_array + i), 0)) {

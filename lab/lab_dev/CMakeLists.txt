@@ -10,6 +10,6 @@ set(LIBS libs/libs.c libs/libs.h)
 set(HASH_MAP libs/hash_map.c libs/hash_map.h)
 set(TREE_LIB libs/tree.c libs/tree.h)
 
-add_executable(lab_dev ${SOURCE_FILES}) # ${LIBS} ${HASH_MAP} ${TREE_LIB})
+add_executable(lab_dev ${SOURCE_FILES} ${LIBS}) # ${HASH_MAP} ${TREE_LIB})
 
-target_link_libraries(lab_dev pthread)
+target_link_libraries(lab_dev pthread rt)

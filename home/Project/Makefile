@@ -32,4 +32,4 @@ tree2.o: libs/tree2.o
 	$(CC) $(CFLAGS) -c libs/tree2.c
 
 clean:
-	rm -rf *o main dbg_main
+	rm -rf *.o main dbg_main
