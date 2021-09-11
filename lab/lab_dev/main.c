@@ -1,72 +1,87 @@
-#include <assert.h>
-#include <pthread.h>
-#include <semaphore.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+#include <assert.h>
 #include <unistd.h>
 
-#define handle_error(_msg)  \
-    do {                    \
-        perror(_msg);       \
-        exit(EXIT_FAILURE); \
-    } while (0);
+/* 1. type name;
+ * 2. type name(type name, ...); {}
+ * 3. & && | ||
+ * 4. if (expr)
+ *      stmnt
+ *    else
+ *      stmnt
+ *
+ *    while (expr)
+ *      stmnt
+ *
+ *    for (expr1; expr2; expr3)
+ *      stmnt
+ *
+ *    do
+ *      stmnt
+ *    while(expr)
+ *
+ *    expr1 ? expr2 : expr3;
+ * 5. int a, *pa
+ *
+ * ---------------------------
+ *
+ * 5.5. I/O: printf, scanf, getchar, putchar, fgets, fread, fwrite, etc.
+ * 5.5.5. __asm__
+ *
+ * ---------------------------
+ *
+ * 6. struct, union, enum, typedef
+ * 7. int a[10]
+ * 8. const char *str = "Hello!"
+ * 9. std::list, std::queue, std::stack, std::deque
+ * 10. std::array, std::vector, std::string
+ * 11. std::set, std::map, std::multiset, std::multimap, std::unordered_map, std::unordered_multimap, ...
+ * 12. std::sort, ...
+ * 13. ...
+ * 14. Problems
+ */
 
-#define NT  10
+static const char * const string = "Hello, World!\n";
+static char *pstring = NULL;
+#define len_string sizeof("Hello, World!\n") - 1
 
-static pthread_cond_t conds[NT - 1];
-static pthread_mutex_t mutex;
+#define len_string2 (1024)
+char string2[len_string2];
 
-_Noreturn static void *thread_func(void *_thread_num)
+
+main(int aa, int bb)
 {
-    size_t *thread_num = _thread_num;
-    assert(thread_num != NULL);
+/*    syscall(SYS_WRITE, 1, string, len_string);
+    syscall(SYS_EXIT, 0);*/
 
-/*    pthread_mutex_lock(&mutex);
-    pthread_cond_wait(conds + *thread_num, &mutex);*/
+/*    pstring = string;
 
-    for (;;) {
-        pthread_mutex_lock(&mutex);
 
-        printf("This tread: %lu; to wake: %ld\n", *thread_num, (*thread_num + 1) % (NT - 1));
-        sleep(1);
+    string = "Hello, aaaa!!!";*/
 
-        pthread_cond_signal(conds + ((*thread_num + 1) % (NT - 1)));
-        pthread_cond_wait(conds + *thread_num, &mutex);
+    int a;
+    int b = 5;
+
+    write(1, string, len_string);
+
+/*    exit(0);*/
+
+    if ( 2 + 2 >= 5 )
+    {
+
     }
-}
+    else
+    {
 
-
-main()
-{
-    pthread_t thrd_array[NT - 1];
-    size_t thrd_indices[NT - 1];
-    size_t i;
-
-    for (i = 0; i < sizeof(thrd_indices) / sizeof(thrd_indices[0]); ++i) {
-        thrd_indices[i] = i;
     }
 
-    pthread_mutex_init(&mutex, NULL);
-
-    for (i = 0; i < sizeof(conds) / sizeof(conds[0]); ++i) {
-        if (pthread_cond_init(conds + i, NULL)) {
-            handle_error("pthread_cond_init()");
-        }
-    }
-
-    for (i = 0; i < sizeof(thrd_array) / sizeof(thrd_array[0]); ++i) {
-        if (pthread_create(thrd_array + i, NULL, thread_func, thrd_indices + i)) {
-            handle_error("pthread_create()");
-        }
-    }
-
-    /*pthread_cond_signal(&conds[thrd_indices[0]]);*/
-
-    for (i = 0; i < sizeof(thrd_array) / sizeof(thrd_array[0]); ++i) {
-        if (pthread_join(*(thrd_array + i), 0)) {
-            handle_error("pthread_join()");
-        }
+    switch ( expr )
+    {
+        case 1:
+            break;
+        default:
+            break;
     }
 
     return 0;
