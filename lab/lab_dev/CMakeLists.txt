@@ -5,14 +5,17 @@ enable_language(ASM)
 
 set(CMAKE_C_STANDARD 90)
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m32")
-set(CMAKE_ASM_FLAGS "${CMAKE_ASM_FLAGS} -m32")
+set(LIB_CRYPT crypt.c crypt.h)
+set(LIB_CMDLINE cmdline.c cmdline.h)
 
-set(SOURCE_FILES main.c)
-set(LIBS libs/libs.c libs/libs.h)
-set(HASH_MAP libs/hash_map.c libs/hash_map.h)
-set(TREE_LIB libs/tree.c libs/tree.h)
+add_executable(lab_dev main.c ${LIB_CRYPT} ${LIB_CMDLINE})
 
-add_executable(lab_dev ${SOURCE_FILES}) # ${LIBS}) # ${HASH_MAP} ${TREE_LIB})
-
-#target_link_libraries(lab_dev pthread rt)
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(GLIB REQUIRED IMPORTED_TARGET glib-2.0)
+include_directories(
+        src/include
+        ${GLIB_INCLUDE_DIRS}
+        /usr/local/include/glib-2.0
+)
+link_directories(${GLIB_INCLUDE_DIRS})
+target_link_libraries(lab_dev PkgConfig::GLIB)
