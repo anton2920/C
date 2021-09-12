@@ -13,12 +13,12 @@ GQuark cmdline_error_quark(void)
 gboolean cmdline_parse(struct cmdline_results *results, gint *argc, gchar ***argv, GError **error)
 {
     GOptionEntry cmdline_entries[] = {
-        { "encrypt", 'e', 0, G_OPTION_ARG_NONE,     &results->toggled_encrypt, "Encrypt provided input with provided key",             NULL },
-        { "decrypt", 'd', 0, G_OPTION_ARG_NONE,     &results->toggled_decrypt, "Decrypt previously encrypted input with provided key", NULL },
-        { "input",   'i', 0, G_OPTION_ARG_FILENAME, &results->input,           "File to perform operation on",                "file" },
-        { "key",     'k', 0, G_OPTION_ARG_FILENAME, &results->key,             "Key file to use for operation",               "file" },
-        { "output",  'o', 0, G_OPTION_ARG_FILENAME, &results->output,          "Optional location to store program's output", "file" },
-        { NULL }
+            { "encrypt", 'e', 0, G_OPTION_ARG_NONE,     &results->toggled_encrypt, "Encrypt provided input with provided key",             NULL },
+            { "decrypt", 'd', 0, G_OPTION_ARG_NONE,     &results->toggled_decrypt, "Decrypt previously encrypted input with provided key", NULL },
+            { "input",   'i', 0, G_OPTION_ARG_FILENAME, &results->input,           "File to perform operation on",                "file" },
+            { "key",     'k', 0, G_OPTION_ARG_FILENAME, &results->key,             "Key file to use for operation",               "file" },
+            { "output",  'o', 0, G_OPTION_ARG_FILENAME, &results->output,          "Optional location to store program's output", "file" },
+            { NULL }
     };
     GOptionContext *cmdline_ctx;
 
@@ -86,11 +86,19 @@ gboolean cmdline_parse(struct cmdline_results *results, gint *argc, gchar ***arg
 void cmdline_cleanup(struct cmdline_results *results)
 {
     g_assert_nonnull(results);
-    g_assert_nonnull(results->input);
-    g_assert_nonnull(results->key);
-    g_assert_nonnull(results->output);
 
-    g_free(results->input);
-    g_free(results->key);
-    g_free(results->output);
+    if (results->input != NULL) {
+        g_free(results->input);
+        results->input = NULL;
+    }
+
+    if (results->key != NULL) {
+        g_free(results->key);
+        results->key = NULL;
+    }
+
+    if (results->output != NULL) {
+        g_free(results->output);
+        results->output = NULL;
+    }
 }
