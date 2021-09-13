@@ -4,7 +4,7 @@
 static const gchar *cmdline_default_output = "./output";
 
 
-GQuark cmdline_error_quark(void)
+static GQuark cmdline_error_quark(void)
 {
     return g_quark_from_static_string("cmdline-error-quark");
 }

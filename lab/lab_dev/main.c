@@ -1,5 +1,5 @@
 #include "cmdline.h"
-#include "crypt.h"
+#include "caesar.h"
 
 
 int main(gint argc, gchar *argv[])

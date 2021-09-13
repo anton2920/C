@@ -1,14 +1,16 @@
-#include "crypt.h"
+#include "caesar.h"
 
 static const gchar *alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ .,0123456789";
 
 
-GQuark crypt_error_quark(void)
+/* ======== ERROR DOMAIN SETUP ======== */
+static GQuark caesar_error_quark(void)
 {
-    return g_quark_from_static_string("crypt-error-quark");
+    return g_quark_from_static_string("caesar-error-quark");
 }
 
 
+/* ======== BLOCK OF MISC HELPERS ======== */
 static gboolean _is_text_valid(GString *text, GError **error)
 {
     const gchar *endptr;
@@ -20,8 +22,8 @@ static gboolean _is_text_valid(GString *text, GError **error)
     if (!g_utf8_validate(text->str, (gssize) text->len, &endptr)) {
         g_assert_nonnull(endptr);
         g_set_error(error,
-                    CRYPT_ERROR,
-                    CRYPT_ERROR_TEXT_NOT_UTF8,
+                    CAESAR_ERROR,
+                    CAESAR_ERROR_TEXT_NOT_UTF8,
                     "Given input is not in UTF-8: invalid character '%c'", *endptr);
         return FALSE;
     }
@@ -29,8 +31,8 @@ static gboolean _is_text_valid(GString *text, GError **error)
     for (i = 0; i < text->len; ++i) {
         if (g_utf8_strchr(alphabet, -1, text->str[i]) == NULL) {
             g_set_error(error,
-                        CRYPT_ERROR,
-                        CRYPT_ERROR_TEXT_NOT_IN_ALPHABET,
+                        CAESAR_ERROR,
+                        CAESAR_ERROR_TEXT_NOT_IN_ALPHABET,
                         "Character '%c' is not from alphabet", text->str[i]);
             return FALSE;
         }
@@ -54,8 +56,8 @@ static gboolean _is_keyword_valid(GString *keyword, GError **error)
 
     if (keyword->len > g_utf8_strlen(alphabet, -1)) {
         g_set_error(error,
-                    CRYPT_ERROR,
-                    CRYPT_ERROR_KEYWORD_TOO_LONG,
+                    CAESAR_ERROR,
+                    CAESAR_ERROR_KEYWORD_TOO_LONG,
                     "Keyword string must be less than length of an alphabet (<%lu)",
                     g_utf8_strlen(alphabet, -1));
         return FALSE;
@@ -65,8 +67,8 @@ static gboolean _is_keyword_valid(GString *keyword, GError **error)
         for (j = i + 1; j < keyword->len; ++j) {
             if (keyword->str[i] == keyword->str[j]) {
                 g_set_error(error,
-                            CRYPT_ERROR,
-                            CRYPT_ERROR_KEYWORD_NOT_UNIQUE,
+                            CAESAR_ERROR,
+                            CAESAR_ERROR_KEYWORD_NOT_UNIQUE,
                             "Characters in keyword should be unique, but '%c' is not", keyword->str[i]);
                 return FALSE;
             }
@@ -134,8 +136,8 @@ static GString *_caesar_cypher_process_ex(GString *text, gssize offset, GString 
 
     if ((offset < 0) || (offset > g_utf8_strlen(alphabet, -1))) {
         g_set_error(error,
-                    CRYPT_ERROR,
-                    CRYPT_ERROR_CAESAR_INVALID_OFFSET,
+                    CAESAR_ERROR,
+                    CAESAR_ERROR_CAESAR_INVALID_OFFSET,
                     "Offset should be in following range: 0 <= offset <= %ld, but offset is %ld",
                     g_utf8_strlen(alphabet, -1), offset);
         return NULL;
