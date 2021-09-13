@@ -15,7 +15,6 @@ pkg_check_modules(GLIB REQUIRED IMPORTED_TARGET glib-2.0)
 include_directories(
         src/include
         ${GLIB_INCLUDE_DIRS}
-        /usr/local/include/glib-2.0
 )
 link_directories(${GLIB_INCLUDE_DIRS})
 target_link_libraries(lab_dev PkgConfig::GLIB)

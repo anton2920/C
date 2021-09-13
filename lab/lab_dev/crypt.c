@@ -95,6 +95,7 @@ static GString *_caesar_get_alphabet(gssize offset, GString *keyword, GError **e
         /* Constructing new alphabet using given keyword */
         if (!_is_keyword_valid(keyword, error)) {
             g_assert((error == NULL) || (*error != NULL));
+            g_string_free(working_alphabet, TRUE);
             return NULL;
         }
 
@@ -200,57 +201,7 @@ static GString *_caesar_cypher_decrypt(GString *text, gssize offset, GString *ke
 }
 
 
-static GString *_simple_table_encrypt(GString *text)
-{
-    GString *result = NULL;
-
-    g_assert_nonnull(text);
-
-    return result;
-}
-
-
-static GString *_simple_table_decrypt(GString *text)
-{
-    GString *result = NULL;
-
-    g_assert_nonnull(text);
-
-    return result;
-}
-
-
-GString *encrypt(GString *text, gssize offset, GString *keyword, GError **error)
-{
-    GString *result;
-
-    g_assert_nonnull(text);
-
-    if ((result = _caesar_cypher_encrypt(text, offset, keyword, error)) == NULL) {
-        g_assert((error == NULL) || (*error != NULL));
-        return NULL;
-    }
-
-    /*return _simple_table_encrypt(result);*/
-    return result;
-}
-
-
-GString *decrypt(GString *text, gssize offset, GString *keyword, GError **error)
-{
-    GString *result;
-
-    g_assert_nonnull(text);
-
-/*    result = _simple_table_decrypt(text);
-    g_assert_nonnull(result);*/
-    result = text;
-
-    return _caesar_cypher_decrypt(result, offset, keyword, error);
-}
-
-
-boolean _process_file_ex(GIOChannel *input_file, GIOChannel *key_file, GIOChannel *output_file, GError **error,
+static gboolean _process_file_ex(GIOChannel *input_file, GIOChannel *key_file, GIOChannel *output_file, GError **error,
                          GString *(*process_func)(GString *, gssize, GString *, GError **))
 {
     GString *input_str = NULL, *output_str = NULL, *keyword_str = NULL;
@@ -305,6 +256,7 @@ boolean _process_file_ex(GIOChannel *input_file, GIOChannel *key_file, GIOChanne
         if ((output_str = process_func(input_str, key_value, keyword_str, error)) == NULL) {
             g_assert((error == NULL) || (*error != NULL));
             g_string_free(input_str, TRUE);
+            g_string_free(keyword_str, TRUE);
             return FALSE;
         }
 
@@ -312,6 +264,7 @@ boolean _process_file_ex(GIOChannel *input_file, GIOChannel *key_file, GIOChanne
                                           &bytes_written, error);
         if ((bytes_written != output_str->len) || (status == G_IO_STATUS_ERROR)) {
             g_string_free(input_str, TRUE);
+            g_string_free(keyword_str, TRUE);
             g_string_free(output_str, TRUE);
             return FALSE;
         }
@@ -320,6 +273,7 @@ boolean _process_file_ex(GIOChannel *input_file, GIOChannel *key_file, GIOChanne
         status = g_io_channel_write_unichar(output_file, '\n', error);
         if (status == G_IO_STATUS_ERROR) {
             g_string_free(input_str, TRUE);
+            g_string_free(keyword_str, TRUE);
             return FALSE;
         }
     }
@@ -331,13 +285,14 @@ boolean _process_file_ex(GIOChannel *input_file, GIOChannel *key_file, GIOChanne
 }
 
 
-boolean encrypt_file(GIOChannel *input_file, GIOChannel *key_file, GIOChannel *output_file, GError **error)
+/* ======== BLOCK OF EXPORTED API ======== */
+gboolean encrypt_file(GIOChannel *input_file, GIOChannel *key_file, GIOChannel *output_file, GError **error)
 {
-    return _process_file_ex(input_file, key_file, output_file, error, encrypt);
+    return _process_file_ex(input_file, key_file, output_file, error, _caesar_cypher_encrypt);
 }
 
 
-boolean decrypt_file(GIOChannel *input_file, GIOChannel *key_file, GIOChannel *output_file, GError **error)
+gboolean decrypt_file(GIOChannel *input_file, GIOChannel *key_file, GIOChannel *output_file, GError **error)
 {
-    return _process_file_ex(input_file, key_file, output_file, error, decrypt);
+    return _process_file_ex(input_file, key_file, output_file, error, _caesar_cypher_decrypt);
 }
