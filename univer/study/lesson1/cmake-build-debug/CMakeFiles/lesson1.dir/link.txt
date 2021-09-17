@@ -1,1 +1,0 @@
-/usr/bin/cc -g   CMakeFiles/lesson1.dir/main.c.o  -o lesson1 

@@ -1,3 +1,0 @@
-/home/anton/C/univer/study/lesson1/cmake-build-debug/CMakeFiles/edit_cache.dir
-/home/anton/C/univer/study/lesson1/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/home/anton/C/univer/study/lesson1/cmake-build-debug/CMakeFiles/lesson1.dir
