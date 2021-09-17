@@ -1,7 +1,7 @@
 # Initializing variables
 CC = gcc
 CFLAGS = -Wall -Wextra -O2 -std=c90
-LDFLAGS = -lSTL_Queue -lSTL_Algorithm -lSTL_List -lSTL_Vector
+LDFLAGS = -lSTL
 
 # Main part
 all: main algorithms visual process

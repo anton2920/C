@@ -1,7 +1,7 @@
 # Initializing variables
 CC = gcc
 CFLAGS = -Wall -Wextra -O2 -std=c90
-LDFLAGS = -lSTL_String
+LDFLAGS = -lSTL
 
 # Main part
 all: main hash_map
