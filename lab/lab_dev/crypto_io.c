@@ -1,5 +1,6 @@
 #include "crypto_io.h"
 
+
 static gboolean _process_file_ex(gchar *input_file_name, gchar *key_file_name, gchar *output_file_name,
                                  crypto_encrypt_cb_t process_func,
                                  crypto_key_parser_cb_t key_parser,
