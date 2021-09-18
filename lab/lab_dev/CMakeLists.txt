@@ -27,3 +27,9 @@ add_library(crypto_simple_table MODULE crypto_simple_table.c crypto_simple_table
 target_include_directories(crypto_simple_table PUBLIC ${GLIB_INCLUDE_DIRS})
 target_link_directories(crypto_simple_table PUBLIC ${GLIB_INCLUDE_DIRS})
 target_link_libraries(crypto_simple_table PkgConfig::GLIB)
+
+add_library(crypto_vigenere MODULE crypto_vigenere.c crypto_vigenere.h)
+target_include_directories(crypto_vigenere PUBLIC ${GLIB_INCLUDE_DIRS})
+target_link_directories(crypto_vigenere PUBLIC ${GLIB_INCLUDE_DIRS})
+target_link_libraries(crypto_vigenere PkgConfig::GLIB)
+
