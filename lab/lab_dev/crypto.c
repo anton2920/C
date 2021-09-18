@@ -107,7 +107,7 @@ static crypto_cipher_t *crypto_get_cipher(gchar *name, GError **error)
     if (!g_module_symbol(caesar_module, symbol_name->str, (gpointer *) &ret)) {
         g_set_error(error,
                     CRYPTO_MAIN_ERROR,
-                    CRYPTO_MAIN_ERROR_MODULE_OPEN,
+                    CRYPTO_MAIN_ERROR_MODULE_SYMBOL,
                     "Failed to load symbol '%s' %s",
                     symbol_name->str,
                     g_module_error());

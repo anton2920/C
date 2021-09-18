@@ -21,7 +21,7 @@ static gboolean _process_file_ex(gchar *input_file_name, gchar *key_file_name, g
 
     /* Key data after parsing keyfile */
     gssize keyval;
-    g_autoptr(GString) keyword;
+    g_autoptr(GString) keyword = NULL;
 
     /* Misc. context variables */
     gsize bytes_written, term_pos;

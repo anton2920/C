@@ -20,14 +20,13 @@ static gboolean _is_text_valid(GString *text, GError **error)
     gsize i;
 
     g_assert_nonnull(text);
-    g_assert_nonnull(text->str);
 
     if (!g_utf8_validate(text->str, (gssize) text->len, &endptr)) {
         g_assert_nonnull(endptr);
         g_set_error(error,
                     CRYPTO_CAESAR_ERROR,
                     CRYPTO_CAESAR_ERROR_TEXT_NOT_UTF8,
-                    "Given input_file_path is not in UTF-8: invalid character '%c'", *endptr);
+                    "given input is not in UTF-8: invalid character '%c'", *endptr);
         return FALSE;
     }
 
@@ -36,7 +35,7 @@ static gboolean _is_text_valid(GString *text, GError **error)
             g_set_error(error,
                         CRYPTO_CAESAR_ERROR,
                         CRYPTO_CAESAR_ERROR_TEXT_NOT_IN_ALPHABET,
-                        "Character '%c' is not from alphabet", text->str[i]);
+                        "character '%c' is not from alphabet", text->str[i]);
             return FALSE;
         }
     }
@@ -61,7 +60,7 @@ static gboolean _is_keyword_valid(GString *keyword, GError **error)
         g_set_error(error,
                     CRYPTO_CAESAR_ERROR,
                     CRYPTO_CAESAR_ERROR_KEYWORD_TOO_LONG,
-                    "Keyword string must be less than length of an alphabet (<%lu)",
+                    "keyword string must be less than length of an alphabet (<%lu)",
                     g_utf8_strlen(alphabet, -1));
         return FALSE;
     }
@@ -72,7 +71,7 @@ static gboolean _is_keyword_valid(GString *keyword, GError **error)
                 g_set_error(error,
                             CRYPTO_CAESAR_ERROR,
                             CRYPTO_CAESAR_ERROR_KEYWORD_NOT_UNIQUE,
-                            "Characters in keyword should be unique, but '%c' is not", keyword->str[i]);
+                            "characters in keyword should be unique, but '%c' is not", keyword->str[i]);
                 return FALSE;
             }
         }
@@ -98,12 +97,6 @@ static GString *_caesar_get_alphabet(gssize offset, GString *keyword, GError **e
 
     if (keyword != NULL) {
         /* Constructing new alphabet using given keyword */
-        if (!_is_keyword_valid(keyword, error)) {
-            g_assert((error == NULL) || (*error != NULL));
-            g_string_free(working_alphabet, TRUE);
-            return NULL;
-        }
-
         g_string_append_len(working_alphabet, keyword->str, (gssize) keyword->len);
 
         for (i = 0; i < alphabet_len; ++i) {
@@ -124,13 +117,15 @@ static GString *_caesar_get_alphabet(gssize offset, GString *keyword, GError **e
 }
 
 
-static GString *_caesar_cypher_process_ex(GString *text, gssize offset, GString *keyword, GError **error,
-                                          void (*process_cb)(GString *, GString *, GString *))
+static GString *_caesar_cypher_process_ex(GString *text, gssize offset, GString *keyword,
+                                          void (*process_cb)(GString *, GString *, GString *),
+                                          GError **error)
 {
     GString *working_alphabet;
     GString *result = NULL;
 
     g_assert_nonnull(text);
+    g_assert_nonnull(process_cb);
 
     if (!_is_text_valid(text, error)) {
         g_assert((error == NULL) || (*error != NULL));
@@ -140,8 +135,8 @@ static GString *_caesar_cypher_process_ex(GString *text, gssize offset, GString 
     if ((offset < 0) || (offset > g_utf8_strlen(alphabet, -1))) {
         g_set_error(error,
                     CRYPTO_CAESAR_ERROR,
-                    CRYPTO_CAESAR_ERROR_CAESAR_INVALID_OFFSET,
-                    "Offset should be in following range: 0 <= offset <= %ld, but offset is %ld",
+                    CRYPTO_CAESAR_ERROR_INVALID_OFFSET,
+                    "offset should be in following range: 0 <= offset <= %ld, but offset is %ld",
                     g_utf8_strlen(alphabet, -1), offset);
         return NULL;
     }
@@ -180,7 +175,7 @@ static void _caesar_encrypt_cb(GString *text, GString *working_alphabet, GString
 
 static GString *_caesar_cypher_encrypt(GString *text, gssize offset, GString *keyword, GError **error)
 {
-    return _caesar_cypher_process_ex(text, offset, keyword, error, _caesar_encrypt_cb);
+    return _caesar_cypher_process_ex(text, offset, keyword, _caesar_encrypt_cb, error);
 }
 
 
@@ -202,41 +197,63 @@ static void _caesar_decrypt_cb(GString *text, GString *working_alphabet, GString
 
 static GString *_caesar_cypher_decrypt(GString *text, gssize offset, GString *keyword, GError **error)
 {
-    return _caesar_cypher_process_ex(text, offset, keyword, error, _caesar_decrypt_cb);
+    return _caesar_cypher_process_ex(text, offset, keyword, _caesar_decrypt_cb, error);
 }
 
 
 static gboolean _caesar_cypher_key_parser(GString *key_text, gssize *offset, GString **keyword, GError **error)
 {
-    gchar *endptr;
+    gchar **tokens, *token, *endptr;
 
-    *offset = (int) g_ascii_strtoll(key_text->str, &endptr, 10);
-    if (endptr == key_text->str) {
+    g_assert_nonnull(key_text);
+    g_assert_nonnull(offset);
+    g_assert_nonnull(keyword);
+    g_assert_null(*keyword);
+
+    if (key_text->len == 0) {
         g_set_error(error,
                     CRYPTO_CAESAR_ERROR,
                     CRYPTO_CAESAR_ERROR_INVALID_KEY,
-                    "Supplied key contains invalid value for Caesar's offset");
+                    "supplied key file is empty");
         return FALSE;
     }
 
-    if ((endptr + 1) < (key_text->str + key_text->len)) {
-        (*keyword) = g_string_new_len(endptr + 1, ((gssize) key_text->len) - ((endptr + 1) - key_text->str));
+    /* Splitting given key string */
+    tokens = g_strsplit_set(key_text->str, " \t\v\r\n", 2);
+    token = g_strchug(g_strchomp(tokens[0]));
+    g_assert_nonnull(token);
+
+    *offset = g_ascii_strtoll(token, &endptr, 10);
+    if ((endptr != NULL) && (*endptr != '\0')) {
+        g_set_error(error,
+                    CRYPTO_CAESAR_ERROR,
+                    CRYPTO_CAESAR_ERROR_INVALID_KEY,
+                    "supplied key contains invalid value for Caesar's offset");
+        g_strfreev(tokens);
+        return FALSE;
+    }
+
+    token = g_strchug(g_strchomp(tokens[1]));
+    if ((token != NULL) && (g_utf8_strlen(token, -1) > 0)) {
+        *keyword = g_string_new(token);
         g_assert_nonnull(*keyword);
 
-        /* Strip anything at the end */
-        while ((*keyword)->str[(*keyword)->len - 1] == '\n') {
-            (*keyword)->str[--(*keyword)->len] = '\0';
+        /* Checking the keyword */
+        if (!_is_keyword_valid(*keyword, error)) {
+            g_assert((error == NULL) || (*error != NULL));
+            return FALSE;
         }
     } else {
-        (*keyword) = NULL; /* No keyword in the file */
+        *keyword = NULL; /* No keyword in the file */
     }
+
+    g_strfreev(tokens);
 
     return TRUE;
 }
 
 
-crypto_cipher_t crypto_caesar_decl =
-{
+crypto_cipher_t crypto_caesar_decl = {
     .encrypt_cb = _caesar_cypher_encrypt,
     .decrypt_cb = _caesar_cypher_decrypt,
     .key_parser_cb = _caesar_cypher_key_parser

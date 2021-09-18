@@ -23,8 +23,8 @@ static inline void crypto_cmdline_missing(GOptionEntry *entry, GError **error)
 gboolean crypto_cmdline_parse(crypto_cmdline_results_t *results, gint *argc, gchar ***argv, GError **error)
 {
     GOptionEntry cmdline_entries[] = {
-        { "encrypt", 'e', 0, G_OPTION_ARG_NONE,     &results->toggled_encrypt,  "Encrypt provided input_file_path with provided key_file_path",             NULL },
-        { "decrypt", 'd', 0, G_OPTION_ARG_NONE,     &results->toggled_decrypt,  "Decrypt previously encrypted input_file_path with provided key_file_path", NULL },
+        { "encrypt", 'e', 0, G_OPTION_ARG_NONE,     &results->toggled_encrypt,  "Encrypt provided 'input' with provided 'key'",             NULL },
+        { "decrypt", 'd', 0, G_OPTION_ARG_NONE,     &results->toggled_decrypt,  "Decrypt previously encrypted 'input' with provided 'key'", NULL },
         { "input",   'i', 0, G_OPTION_ARG_FILENAME, &results->input_file_path,  "File to perform operation on",                          "file" },
         { "key",     'k', 0, G_OPTION_ARG_FILENAME, &results->key_file_path,    "Key file to use for operation",                         "file" },
         { "output",  'o', 0, G_OPTION_ARG_FILENAME, &results->output_file_path, "Optional location to store program's output_file_path", "file" },
@@ -33,7 +33,7 @@ gboolean crypto_cmdline_parse(crypto_cmdline_results_t *results, gint *argc, gch
     };
     g_autoptr(GOptionContext) cmdline_ctx;
 
-    cmdline_ctx = g_option_context_new(" - Caesar++ encryptor/decrypter");
+    cmdline_ctx = g_option_context_new("- Professional encryptor/decrypter");
     g_assert_nonnull(cmdline_ctx);
 
     g_option_context_add_main_entries(cmdline_ctx, cmdline_entries, NULL);
