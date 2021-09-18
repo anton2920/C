@@ -11,7 +11,7 @@ typedef struct _crypto_cmdline_results {
     gchar *input_file_path;
     gchar *key_file_path;
     gchar *output_file_path;
-    gboolean toggled_verbose;
+    gchar *cipher_lib;
 } crypto_cmdline_results_t;
 
 typedef enum {

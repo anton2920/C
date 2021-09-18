@@ -10,6 +10,16 @@ static GQuark crypto_cmdline_error_quark(void)
 }
 
 
+static inline void crypto_cmdline_missing(GOptionEntry *entry, GError **error)
+{
+    g_set_error(error,
+                CRYPTO_CMDLINE_ERROR,
+                CRYPTO_CMDLINE_ERROR_MISSING,
+                "Missing mandatory parameter '--%s|-%c'",
+                entry->long_name, entry->short_name);
+}
+
+
 gboolean crypto_cmdline_parse(crypto_cmdline_results_t *results, gint *argc, gchar ***argv, GError **error)
 {
     GOptionEntry cmdline_entries[] = {
@@ -18,7 +28,7 @@ gboolean crypto_cmdline_parse(crypto_cmdline_results_t *results, gint *argc, gch
         { "input",   'i', 0, G_OPTION_ARG_FILENAME, &results->input_file_path,  "File to perform operation on",                          "file" },
         { "key",     'k', 0, G_OPTION_ARG_FILENAME, &results->key_file_path,    "Key file to use for operation",                         "file" },
         { "output",  'o', 0, G_OPTION_ARG_FILENAME, &results->output_file_path, "Optional location to store program's output_file_path", "file" },
-        { "verbose", 'v', 0, G_OPTION_ARG_NONE,     &results->toggled_verbose,  "Be verbose (TODO)",                                                        NULL },
+        { "cipher",  'c', 0, G_OPTION_ARG_FILENAME, &results->cipher_lib,       "DLL to load cipher capabilities from",                  "file" },
         { NULL }
     };
     g_autoptr(GOptionContext) cmdline_ctx;
@@ -54,26 +64,23 @@ gboolean crypto_cmdline_parse(crypto_cmdline_results_t *results, gint *argc, gch
     }
 
     if (results->input_file_path == NULL) {
-        g_set_error(error,
-                    CRYPTO_CMDLINE_ERROR,
-                    CRYPTO_CMDLINE_ERROR_MISSING,
-                    "Missing mandatory parameter '--%s|-%c'",
-                    cmdline_entries[2].long_name, cmdline_entries[2].short_name);
+        crypto_cmdline_missing(cmdline_entries + 2, error);
         return FALSE;
     }
 
     if (results->key_file_path == NULL) {
-        g_set_error(error,
-                    CRYPTO_CMDLINE_ERROR,
-                    CRYPTO_CMDLINE_ERROR_MISSING,
-                    "Missing mandatory parameter '--%s|-%c'",
-                    cmdline_entries[3].long_name, cmdline_entries[3].short_name);
+        crypto_cmdline_missing(cmdline_entries + 3, error);
         return FALSE;
     }
 
     if (results->output_file_path == NULL) {
         results->output_file_path = g_strdup(crypto_cmdline_default_output);
         g_assert_nonnull(results->output_file_path);
+    }
+
+    if (results->cipher_lib == NULL) {
+        crypto_cmdline_missing(cmdline_entries + 5, error);
+        return FALSE;
     }
 
     return TRUE;
@@ -96,6 +103,11 @@ void crypto_cmdline_cleanup(crypto_cmdline_results_t *results)
 
     if (results->output_file_path != NULL) {
         g_free(results->output_file_path);
+        results->output_file_path = NULL;
+    }
+
+    if (results->cipher_lib != NULL) {
+        g_free(results->cipher_lib);
         results->output_file_path = NULL;
     }
 }

@@ -6,7 +6,7 @@
 #include "crypto.h"
 
 
-static crypto_cipher_t *crypto_get_caesar(GError **error);
+static crypto_cipher_t *crypto_get_cipher(gchar *name, GError **error);
 
 
 static GQuark crypto_main_error_quark(void)
@@ -37,8 +37,7 @@ int main(gint argc, gchar *argv[])
     }
 
     /* Getting cipher */
-    /* TODO: add option to choose ciphers */
-    if ((cipher = crypto_get_caesar(&error)) == NULL) {
+    if ((cipher = crypto_get_cipher(cmd_results.cipher_lib, &error)) == NULL) {
         g_printerr("%s\n", error->message);
         exit(EXIT_FAILURE);
     }
@@ -77,13 +76,16 @@ int main(gint argc, gchar *argv[])
 }
 
 
-static crypto_cipher_t *crypto_get_caesar(GError **error)
+static crypto_cipher_t *crypto_get_cipher(gchar *name, GError **error)
 {
+    g_autoptr(GString) symbol_name = NULL;
     GModule *caesar_module;
     crypto_cipher_t *ret;
     gchar *module_path;
 
-    module_path = g_module_build_path(".", CRYPTO_CAESAR_MODULE_FILENAME);
+    g_assert_nonnull(name);
+
+    module_path = g_module_build_path(".", name);
     g_assert_nonnull(module_path);
 
     if ((caesar_module = g_module_open(module_path, G_MODULE_BIND_LAZY)) == NULL) {
@@ -97,20 +99,20 @@ static crypto_cipher_t *crypto_get_caesar(GError **error)
     g_free(module_path);
     g_module_make_resident(caesar_module);
 
-    if (!g_module_symbol(caesar_module, "crypto_cypher_caesar_decl", (gpointer *) &ret)) {
+    symbol_name = g_string_new(NULL);
+    g_assert_nonnull(symbol_name);
+
+    g_string_printf(symbol_name, "%s_decl", name);
+
+    if (!g_module_symbol(caesar_module, symbol_name->str, (gpointer *) &ret)) {
         g_set_error(error,
                     CRYPTO_MAIN_ERROR,
                     CRYPTO_MAIN_ERROR_MODULE_OPEN,
-                    "Failed to load symbol 'crypto_cypher_caesar_decl' %s",
+                    "Failed to load symbol '%s' %s",
+                    symbol_name->str,
                     g_module_error());
         return NULL;
     }
 
     return ret;
-}
-
-
-static crypto_cipher_t *crypto_get_simple_table(GError **error)
-{
-
 }

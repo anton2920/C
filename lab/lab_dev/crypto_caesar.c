@@ -220,7 +220,7 @@ static gboolean _caesar_cypher_key_parser(GString *key_text, gssize *offset, GSt
     }
 
     if ((endptr + 1) < (key_text->str + key_text->len)) {
-        *keyword = g_string_new_len(endptr + 1, ((gssize) key_text->len) - ((endptr + 1) - key_text->str));
+        (*keyword) = g_string_new_len(endptr + 1, ((gssize) key_text->len) - ((endptr + 1) - key_text->str));
         g_assert_nonnull(*keyword);
 
         /* Strip anything at the end */
@@ -234,7 +234,8 @@ static gboolean _caesar_cypher_key_parser(GString *key_text, gssize *offset, GSt
     return TRUE;
 }
 
-crypto_cipher_t crypto_cypher_caesar_decl =
+
+crypto_cipher_t crypto_caesar_decl =
 {
     .encrypt_cb = _caesar_cypher_encrypt,
     .decrypt_cb = _caesar_cypher_decrypt,
