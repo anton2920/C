@@ -37,3 +37,11 @@ add_library(crypto_caesar_athens MODULE crypto_caesar_athens.c crypto_caesar_ath
 target_include_directories(crypto_caesar_athens PUBLIC ${GLIB_INCLUDE_DIRS})
 target_link_directories(crypto_caesar_athens PUBLIC ${GLIB_INCLUDE_DIRS})
 target_link_libraries(crypto_caesar_athens PkgConfig::GLIB)
+
+set(LIB_CRACK_CMDLINE crack_cmdline.c crack_cmdline.h)
+set(LIB_CRACK_PROCESS crack_process.c crack_process.h)
+
+add_executable(crack crack.c ${LIB_CRACK_CMDLINE} ${LIB_CRACK_PROCESS})
+target_include_directories(crack PUBLIC ${GLIB_INCLUDE_DIRS})
+target_link_directories(crack PUBLIC ${GLIB_INCLUDE_DIRS})
+target_link_libraries(crack PkgConfig::GLIB)
