@@ -32,3 +32,8 @@ add_library(crypto_vigenere MODULE crypto_vigenere.c crypto_vigenere.h)
 target_include_directories(crypto_vigenere PUBLIC ${GLIB_INCLUDE_DIRS})
 target_link_directories(crypto_vigenere PUBLIC ${GLIB_INCLUDE_DIRS})
 target_link_libraries(crypto_vigenere PkgConfig::GLIB)
+
+add_library(crypto_caesar_athens MODULE crypto_caesar_athens.c crypto_caesar_athens.h)
+target_include_directories(crypto_caesar_athens PUBLIC ${GLIB_INCLUDE_DIRS})
+target_link_directories(crypto_caesar_athens PUBLIC ${GLIB_INCLUDE_DIRS})
+target_link_libraries(crypto_caesar_athens PkgConfig::GLIB)
