@@ -1,7 +1,5 @@
 cmake_minimum_required(VERSION 3.8)
-project(lab_dev)
-
-enable_language(ASM)
+project(crypto_lab_02)
 
 set(CMAKE_C_STANDARD 90)
 
@@ -18,16 +16,6 @@ target_link_directories(crypto PUBLIC ${GLIB_INCLUDE_DIRS})
 target_link_libraries(crypto PkgConfig::GLIB)
 
 # Creating separate libraries with ciphers
-add_library(crypto_caesar MODULE crypto_caesar.c crypto_caesar.h)
-target_include_directories(crypto_caesar PUBLIC ${GLIB_INCLUDE_DIRS})
-target_link_directories(crypto_caesar PUBLIC ${GLIB_INCLUDE_DIRS})
-target_link_libraries(crypto_caesar PkgConfig::GLIB)
-
-add_library(crypto_simple_table MODULE crypto_simple_table.c crypto_simple_table.h)
-target_include_directories(crypto_simple_table PUBLIC ${GLIB_INCLUDE_DIRS})
-target_link_directories(crypto_simple_table PUBLIC ${GLIB_INCLUDE_DIRS})
-target_link_libraries(crypto_simple_table PkgConfig::GLIB)
-
 add_library(crypto_vigenere MODULE crypto_vigenere.c crypto_vigenere.h)
 target_include_directories(crypto_vigenere PUBLIC ${GLIB_INCLUDE_DIRS})
 target_link_directories(crypto_vigenere PUBLIC ${GLIB_INCLUDE_DIRS})
