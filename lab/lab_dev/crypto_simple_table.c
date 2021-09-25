@@ -60,7 +60,7 @@ static GString *_simple_table_process_ex(GString *text, gssize key,
 
     /* Validating the initial text */
     if (!_is_text_valid(text, error)) {
-        g_assert(error == NULL || *error != NULL);
+        g_assert((error == NULL) || (*error != NULL));
         return NULL;
     }
 

@@ -152,7 +152,7 @@ static gboolean _vigenere_parse_key(GString *key, GString **alphabet_keyword, GS
     g_assert_nonnull(*alphabet_keyword);
     if (!_is_keyword_valid(*alphabet_keyword, error)) {
         g_strfreev(tokens);
-        g_assert(error == NULL || *error != NULL);
+        g_assert((error == NULL) || (*error != NULL));
         return FALSE;
     }
 
@@ -170,7 +170,7 @@ static gboolean _vigenere_parse_key(GString *key, GString **alphabet_keyword, GS
     g_assert_nonnull(*data_keyword);
     if (!_is_keyword_valid(*data_keyword, error)) {
         g_strfreev(tokens);
-        g_assert(error == NULL || *error != NULL);
+        g_assert((error == NULL) || (*error != NULL));
         return FALSE;
     }
 
@@ -195,7 +195,7 @@ static GString *_vigenere_process_ex(GString *text, GString *key,
     }
 
     if (!_vigenere_parse_key(key, &alphabet_keyword, &data_keyword, error)) {
-        g_assert(error == NULL || *error != NULL);
+        g_assert((error == NULL) || (*error != NULL));
         return NULL;
     }
 
