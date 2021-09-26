@@ -1,7 +1,7 @@
 #include <glib.h>
 #include <gmodule.h>
 
-#include "crypto.h"
+#include "../crypto/crypto.h"
 #include "crack_cmdline.h"
 #include "crack_process.h"
 

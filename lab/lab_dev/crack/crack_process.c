@@ -1,7 +1,7 @@
 #include <omp.h>
 
-#include "crypto.h"
-#include "crypto_caesar_athens.h"
+#include "../crypto/crypto.h"
+#include "../ciphers/crypto_caesar_athens.h"
 #include "crack_process.h"
 
 
