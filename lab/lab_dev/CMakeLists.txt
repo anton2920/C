@@ -47,3 +47,9 @@ add_executable(crack crack/crack.c ${LIB_CRACK_CMDLINE} ${LIB_CRACK_PROCESS})
 target_include_directories(crack PUBLIC ${GLIB_INCLUDE_DIRS})
 target_link_directories(crack PUBLIC ${GLIB_INCLUDE_DIRS})
 target_link_libraries(crack PkgConfig::GLIB)
+
+# MD5
+add_executable(md5_main md5.c md5.h md5_main.c)
+target_include_directories(md5_main PUBLIC ${GLIB_INCLUDE_DIRS})
+target_link_directories(md5_main PUBLIC ${GLIB_INCLUDE_DIRS})
+target_link_libraries(md5_main PkgConfig::GLIB gmp)
