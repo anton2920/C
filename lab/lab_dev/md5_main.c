@@ -1,47 +1,57 @@
 #include <glib.h>
+#include <gio/gio.h>
 
 #include "md5.h"
 
 
-#define FILE_NAME ("test.txt")
+#define FILE_NAME    ("test.txt")
+#define SIZE_TO_READ (4194304) /* 4MiB */
 
 
 main()
 {
-    GString *input_string, *hashed_string;
-    GIOChannel *input_file_channel;
-    GError *error = NULL;
-    gsize input_length;
-    gchar *input_data;
-    GIOStatus status;
+    md5_hash_ctx_t md5_ctx;
 
-    input_file_channel = g_io_channel_new_file(FILE_NAME, "r", &error);
-    if (input_file_channel == NULL) {
+    g_autoptr(GFileInputStream) input_stream = NULL;
+    g_autoptr(GFile) input_file = NULL;
+
+    GError *error = NULL;
+    GString *hexdigest;
+
+    guint8 *input_data;
+    gssize nbytes_read;
+
+    md5_hash_ctx_init(&md5_ctx);
+
+    input_file = g_file_new_for_path(FILE_NAME);
+    g_assert_nonnull(input_file);
+
+    input_stream = g_file_read(input_file, NULL, &error);
+    if (input_stream == NULL) {
         g_assert_nonnull(error);
-        g_printerr("Failed to open file: %s\n", error->message);
+        g_printerr("Cannot open file '%s' for input: %s\n", FILE_NAME, error->message);
         exit(EXIT_FAILURE);
     }
 
-    status = g_io_channel_read_to_end(input_file_channel, &input_data, &input_length, &error);
-    if (status != G_IO_STATUS_NORMAL) {
-        g_assert_nonnull(error);
-        g_printerr("Failed to read input file: %s\n", error->message);
+    input_data = g_new(guint8, SIZE_TO_READ);
+    g_assert_nonnull(input_data);
+
+    while ((nbytes_read = g_input_stream_read((GInputStream *) input_stream, input_data, SIZE_TO_READ, NULL, &error))) {
+        if (nbytes_read == -1) {
+            g_free(input_data);
+
+            g_assert_nonnull(error);
+            g_printerr("Cannot read %d bytes from '%s': %s\n", SIZE_TO_READ, FILE_NAME, error->message);
+
+            exit(EXIT_FAILURE);
+        }
+        md5_hash_data(&md5_ctx, input_data, nbytes_read);
     }
-    g_io_channel_unref(input_file_channel);
-
-    input_string = g_string_new(input_data);
-    g_assert_nonnull(input_string);
-
     g_free(input_data);
 
-    hashed_string = md5_hash_get_digest_from_string(input_string);
-    if (hashed_string == NULL) {
-        g_assert_nonnull(error);
-        g_printerr("Failed to calculate MD5 hash from input string: %s\n", error->message);
-    }
+    hexdigest = md5_hash_get_hexdigest(&md5_ctx);
+    g_assert_nonnull(hexdigest);
 
-    g_print("MD5 digest: %s\n", hashed_string->str);
-
-    g_string_free(input_string, TRUE);
-    g_string_free(hashed_string, TRUE);
+    g_print("MD5 hexdigest of '%s': %s\n", FILE_NAME, hexdigest->str);
+    g_string_free(hexdigest, TRUE);
 }

@@ -11,7 +11,7 @@ static inline guint32 md5_left_rotate(guint32 number, guint32 count)
 }
 
 
-GByteArray *md5_hash_get_chunk(const guint8 *data, gsize max_len, gsize *pos)
+static GByteArray *md5_hash_get_chunk(const guint8 *data, gsize max_len, gsize *pos)
 {
     GByteArray *chunk;
     guint64 chunk_len;
@@ -36,21 +36,24 @@ GByteArray *md5_hash_get_chunk(const guint8 *data, gsize max_len, gsize *pos)
     *pos += chunk_len;
 
     chunk_len *= 8;
-    /*chunk_len = GUINT64_TO_BE(chunk_len);*/ /* Convert length to big-endian */
     g_byte_array_append(chunk, (const guint8 *) &chunk_len, sizeof(chunk_len));
-
-    g_print("Chunk bytes: ");
-    guint32 i;
-    for (i = 0; i < chunk->len; ++i) {
-        g_print("%2x ", *(chunk->data + i));
-    }
-    g_print("\n");
 
     return chunk;
 }
 
 
-GString *md5_hash_get_digest_from_string(const GString *input)
+void md5_hash_ctx_init(md5_hash_ctx_t *ctx)
+{
+    g_assert_nonnull(ctx);
+
+    ctx->a = 0x67452301;
+    ctx->b = 0xefcdab89;
+    ctx->c = 0x98badcfe;
+    ctx->d = 0x10325476;
+}
+
+
+void md5_hash_data(md5_hash_ctx_t *ctx, const guint8 *data, gssize len)
 {
     /* MD5 hash constants */
     static const guint32 shift_amounts[] = { 7, 12, 17, 22,  7, 12, 17, 22,  7, 12, 17, 22,  7, 12, 17, 22,
@@ -73,31 +76,26 @@ GString *md5_hash_get_digest_from_string(const GString *input)
                                  0x655b59c3, 0x8f0ccc92, 0xffeff47d, 0x85845dd1,
                                  0x6fa87e4f, 0xfe2ce6e0, 0xa3014314, 0x4e0811a1,
                                  0xf7537e82, 0xbd3af235, 0x2ad7d2bb, 0xeb86d391 };
-    guint32 a0 = 0x67452301, b0 = 0xefcdab89, c0 = 0x98badcfe, d0 = 0x10325476;
     guint32 M[16];
     guint32 A, B, C, D;
     guint32 i, F, g;
 
     /* Other variables */
     GByteArray *chunk = NULL;
-    GString *digest;
     gsize pos;
 
-    g_assert_nonnull(input);
-
-    digest = g_string_new(NULL);
-    g_assert_nonnull(digest);
+    g_assert_nonnull(data);
 
     pos = 0;
     do {
-        chunk = md5_hash_get_chunk((guint8 *) input->str, input->len, &pos);
+        chunk = md5_hash_get_chunk(data, len, &pos);
         g_assert(chunk->len == sizeof(M));
         memcpy(M, chunk->data, sizeof(M));
 
-        A = a0;
-        B = b0;
-        C = c0;
-        D = d0;
+        A = ctx->a;
+        B = ctx->b;
+        C = ctx->c;
+        D = ctx->d;
 
         for (i = 0; i < 64; ++i) {
             if (i < 16) {
@@ -121,21 +119,30 @@ GString *md5_hash_get_digest_from_string(const GString *input)
             B = B + md5_left_rotate(F, shift_amounts[i]);
         }
 
-        a0 += A;
-        b0 += B;
-        c0 += C;
-        d0 += D;
+        ctx->a += A;
+        ctx->b += B;
+        ctx->c += C;
+        ctx->d += D;
 
         g_byte_array_free(chunk, TRUE);
-    } while (pos < input->len);
+    } while (pos < len);
+}
 
-    g_print("\n");
 
-    g_string_sprintf(digest, "%x%.8x%.8x%.8x",
-                     GUINT32_SWAP_LE_BE(a0),
-                     GUINT32_SWAP_LE_BE(b0),
-                     GUINT32_SWAP_LE_BE(c0),
-                     GUINT32_SWAP_LE_BE(d0));
+GString *md5_hash_get_hexdigest(md5_hash_ctx_t *ctx)
+{
+    GString *hexdigest;
 
-    return digest;
+    g_assert_nonnull(ctx);
+
+    hexdigest = g_string_new(NULL);
+    g_assert_nonnull(hexdigest);
+
+    g_string_sprintf(hexdigest, "%x%.8x%.8x%.8x",
+                     GUINT32_SWAP_LE_BE(ctx->a),
+                     GUINT32_SWAP_LE_BE(ctx->b),
+                     GUINT32_SWAP_LE_BE(ctx->c),
+                     GUINT32_SWAP_LE_BE(ctx->d));
+
+    return hexdigest;
 }
