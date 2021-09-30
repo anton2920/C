@@ -4,6 +4,12 @@
 #define MD5_HASH_CHUNK_SIZE         (512 / 8)
 #define MD5_HASH_CHUNK_DATA_SIZE    (448 / 8)
 
+/* MD5 functions */
+#define MD5_F(B, C, D) (((B) & (C)) | ((~(B)) & (D)))
+#define MD5_G(B, C, D) (((B) & (D)) | ((C) & (~(D))))
+#define MD5_H(B, C, D) ((B) ^ (C) ^ (D))
+#define MD5_I(B, C, D) ((C) ^ ((B) | (~(D))))
+
 
 static inline guint32 md5_left_rotate(guint32 number, guint32 count)
 {
@@ -23,20 +29,26 @@ static GByteArray *md5_hash_get_chunk(const guint8 *data, gsize max_len, gsize *
     chunk = g_byte_array_sized_new(MD5_HASH_CHUNK_SIZE);
     g_assert_nonnull(chunk);
 
-    chunk_len = MIN(MD5_HASH_CHUNK_DATA_SIZE, max_len - (*pos));
-    g_byte_array_append(chunk, data, chunk_len);
+    chunk_len = MIN(MD5_HASH_CHUNK_SIZE, max_len - (*pos));
+    g_byte_array_append(chunk, data + (*pos), chunk_len);
 
-    byte = 0x80; /* 0b10000000 */
-    g_byte_array_append(chunk, &byte, sizeof(byte));
-
-    byte = 0x0;
-    while ((chunk->len % MD5_HASH_CHUNK_SIZE) < MD5_HASH_CHUNK_DATA_SIZE) {
-        g_byte_array_append(chunk, &byte, sizeof(byte));
-    }
+    /* Updating current position in original data */
     *pos += chunk_len;
 
-    chunk_len *= 8;
-    g_byte_array_append(chunk, (const guint8 *) &chunk_len, sizeof(chunk_len));
+    /* Padding if necessary */
+    if (chunk_len % MD5_HASH_CHUNK_SIZE) {
+        /* Appending a single bit */
+        byte = 0x80; /* 0b10000000 */
+        g_byte_array_append(chunk, &byte, sizeof(byte));
+
+        /* Padding the remaining length with zeros */
+        byte = 0x0;
+        while ((chunk->len % MD5_HASH_CHUNK_SIZE) < MD5_HASH_CHUNK_DATA_SIZE) {
+            g_byte_array_append(chunk, &byte, sizeof(byte));
+        }
+        chunk_len = max_len * 8;
+        g_byte_array_append(chunk, (const guint8 *) &chunk_len, sizeof(chunk_len));
+    }
 
     return chunk;
 }
@@ -98,18 +110,25 @@ void md5_hash_data(md5_hash_ctx_t *ctx, const guint8 *data, gssize len)
         D = ctx->d;
 
         for (i = 0; i < 64; ++i) {
-            if (i < 16) {
-                F = (B & C) | ((~B) & D);
-                g = i;
-            } else if (i < 32) {
-                F = (B & D) | (C & (~D));
-                g = (5 * i + 1) % 16;
-            } else if (i < 48) {
-                F = B ^ C ^ D;
-                g = (3 * i + 5) % 16;
-            } else {
-                F = C ^ (B | (~D));
-                g = (7 * i) % 16;
+            switch ( i >> 4 ) {  /* Switch on current round */
+                case 0:
+                    F = MD5_F(B, C, D);
+                    g = i;
+                    break;
+                case 1:
+                    F = MD5_G(B, C, D);
+                    g = (5 * i + 1) % 16;
+                    break;
+                case 2:
+                    F = MD5_H(B, C, D);
+                    g = (3 * i + 5) % 16;
+                    break;
+                case 3:
+                    F = MD5_I(B, C, D);
+                    g = (7 * i) % 16;
+                    break;
+                default:
+                    break;
             }
 
             F += A + K[i] + M[g];
@@ -126,23 +145,20 @@ void md5_hash_data(md5_hash_ctx_t *ctx, const guint8 *data, gssize len)
 
         g_byte_array_free(chunk, TRUE);
     } while (pos < len);
+
+    /* Updating hexdigest */
+    g_snprintf(ctx->hexdigest, sizeof(ctx->hexdigest),
+               "%.8x%.8x%.8x%.8x",
+               GUINT32_SWAP_LE_BE(ctx->a),
+               GUINT32_SWAP_LE_BE(ctx->b),
+               GUINT32_SWAP_LE_BE(ctx->c),
+               GUINT32_SWAP_LE_BE(ctx->d));
 }
 
 
-GString *md5_hash_get_hexdigest(md5_hash_ctx_t *ctx)
+const gchar *md5_hash_get_hexdigest(md5_hash_ctx_t *ctx)
 {
-    GString *hexdigest;
-
     g_assert_nonnull(ctx);
 
-    hexdigest = g_string_new(NULL);
-    g_assert_nonnull(hexdigest);
-
-    g_string_sprintf(hexdigest, "%x%.8x%.8x%.8x",
-                     GUINT32_SWAP_LE_BE(ctx->a),
-                     GUINT32_SWAP_LE_BE(ctx->b),
-                     GUINT32_SWAP_LE_BE(ctx->c),
-                     GUINT32_SWAP_LE_BE(ctx->d));
-
-    return hexdigest;
+    return ctx->hexdigest;
 }
