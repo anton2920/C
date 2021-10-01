@@ -4,7 +4,7 @@
 #include "md5.h"
 
 
-#define FILE_NAME    ("/usr/local/bin/ProTest")
+#define FILE_NAME    ("/home/anton/Downloads/android-studio-2020.3.1.24-linux.tar.gz")
 #define SIZE_TO_READ (4194304) /* 4MiB */
 
 
@@ -47,7 +47,7 @@ main()
 
             exit(EXIT_FAILURE);
         }
-        md5_hash_data(&md5_ctx, input_data, nbytes_read);
+        md5_hash_update(&md5_ctx, input_data, nbytes_read);
         g_checksum_update(md5_test, input_data, nbytes_read);
     }
     g_free(input_data);

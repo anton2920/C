@@ -17,7 +17,7 @@ static inline guint32 md5_left_rotate(guint32 number, guint32 count)
 }
 
 
-static GByteArray *md5_hash_get_chunk(const guint8 *data, gsize max_len, gsize *pos)
+static GByteArray *md5_hash_get_chunk(md5_hash_ctx_t *ctx, const guint8 *data, gsize max_len, gsize *pos)
 {
     GByteArray *chunk;
     guint64 chunk_len;
@@ -34,6 +34,7 @@ static GByteArray *md5_hash_get_chunk(const guint8 *data, gsize max_len, gsize *
 
     /* Updating current position in original data */
     *pos += chunk_len;
+    ctx->total_bytes += chunk_len;
 
     /* Padding if necessary */
     if (chunk_len % MD5_HASH_CHUNK_SIZE) {
@@ -46,7 +47,7 @@ static GByteArray *md5_hash_get_chunk(const guint8 *data, gsize max_len, gsize *
         while ((chunk->len % MD5_HASH_CHUNK_SIZE) < MD5_HASH_CHUNK_DATA_SIZE) {
             g_byte_array_append(chunk, &byte, sizeof(byte));
         }
-        chunk_len = max_len * 8;
+        chunk_len = ctx->total_bytes * 8;
         g_byte_array_append(chunk, (const guint8 *) &chunk_len, sizeof(chunk_len));
     }
 
@@ -62,10 +63,11 @@ void md5_hash_ctx_init(md5_hash_ctx_t *ctx)
     ctx->b = 0xefcdab89;
     ctx->c = 0x98badcfe;
     ctx->d = 0x10325476;
+    ctx->total_bytes = 0;
 }
 
 
-void md5_hash_data(md5_hash_ctx_t *ctx, const guint8 *data, gssize len)
+void md5_hash_update(md5_hash_ctx_t *ctx, const guint8 *data, gssize len)
 {
     /* MD5 hash constants */
     static const guint32 shift_amounts[] = { 7, 12, 17, 22,  7, 12, 17, 22,  7, 12, 17, 22,  7, 12, 17, 22,
@@ -100,7 +102,7 @@ void md5_hash_data(md5_hash_ctx_t *ctx, const guint8 *data, gssize len)
 
     pos = 0;
     do {
-        chunk = md5_hash_get_chunk(data, len, &pos);
+        chunk = md5_hash_get_chunk(ctx, data, len, &pos);
         g_assert(chunk->len == sizeof(M));
         memcpy(M, chunk->data, sizeof(M));
 
