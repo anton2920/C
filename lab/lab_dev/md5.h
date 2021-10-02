@@ -17,9 +17,10 @@ enum {
 
 
 typedef struct _md5_hash_ctx {
-    guint32 hash[MD5_HASH_SIZE];
-    guint64 total_bytes;
-    gchar   hexdigest[MD5_HEXDIGEST_SIZE];
+    guint32     hash[MD5_HASH_SIZE];
+    guint64     total_bytes;
+    gchar       hexdigest[MD5_HEXDIGEST_SIZE];
+    gboolean    finalized;
 } md5_hash_ctx_t;
 
 

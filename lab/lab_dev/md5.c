@@ -46,6 +46,9 @@ static inline GByteArray *md5_hash_get_chunk(md5_hash_ctx_t *ctx, const guint8 *
         }
         chunk_len = ctx->total_bytes * 8;
         g_byte_array_append(chunk, (const guint8 *) &chunk_len, sizeof(chunk_len));
+
+        /* Finalizing hash sum */
+        ctx->finalized = TRUE;
     }
 
     return chunk;
@@ -61,6 +64,7 @@ inline void md5_hash_ctx_init(md5_hash_ctx_t *ctx)
     ctx->hash[MD5_C] = 0x98badcfe;
     ctx->hash[MD5_D] = 0x10325476;
     ctx->total_bytes = 0;
+    ctx->finalized = FALSE;
 }
 
 
@@ -95,7 +99,13 @@ void md5_hash_update(md5_hash_ctx_t *ctx, const guint8 *data, gssize len)
     GByteArray *chunk = NULL;
     gsize pos = 0;
 
+    g_assert_nonnull(ctx);
     g_assert_nonnull(data);
+
+    if (ctx->finalized) {
+        g_warning("MD5 hash is finalized; cannot update anymore");
+        return;
+    }
 
     do {
         chunk = md5_hash_get_chunk(ctx, data, len, &pos); /* 'chunk->len' is a multiple of 'MD5_HASH_CHUNK_SIZE' */
