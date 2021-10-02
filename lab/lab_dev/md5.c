@@ -41,7 +41,7 @@ static inline GByteArray *md5_hash_get_chunk(md5_hash_ctx_t *ctx, const guint8 *
 
         /* Padding the remaining length with zeros */
         byte = 0x0;
-        while ((chunk->len % MD5_HASH_CHUNK_SIZE) < MD5_HASH_CHUNK_DATA_SIZE) {
+        while ((chunk->len % MD5_HASH_CHUNK_SIZE) != MD5_HASH_CHUNK_DATA_SIZE) {
             g_byte_array_append(chunk, &byte, sizeof(byte));
         }
         chunk_len = ctx->total_bytes * 8;
@@ -89,7 +89,7 @@ void md5_hash_update(md5_hash_ctx_t *ctx, const guint8 *data, gssize len)
                                  0xf7537e82, 0xbd3af235, 0x2ad7d2bb, 0xeb86d391 };
     guint32 curr[MD5_HASH_SIZE];
     guint32 (*M)[16];
-    guint32 i, F, g, part;
+    guint32 i, F, g, part, chunk_pos;
 
     /* Other variables */
     GByteArray *chunk = NULL;
@@ -98,46 +98,50 @@ void md5_hash_update(md5_hash_ctx_t *ctx, const guint8 *data, gssize len)
     g_assert_nonnull(data);
 
     do {
-        chunk = md5_hash_get_chunk(ctx, data, len, &pos);
-        M = (guint32 (*)[16]) chunk->data;
+        chunk = md5_hash_get_chunk(ctx, data, len, &pos); /* 'chunk->len' is a multiple of 'MD5_HASH_CHUNK_SIZE' */
+        g_assert_nonnull(chunk);
 
-        #pragma omp simd
-        for (part = 0; part < MD5_HASH_SIZE; ++part) {
-            curr[part] = ctx->hash[part];
-        }
+        for (chunk_pos = 0; chunk_pos < chunk->len; chunk_pos += MD5_HASH_CHUNK_SIZE) {
+            M = (guint32 (*)[16]) (chunk->data + chunk_pos);
 
-        for (i = 0; i < 64; ++i) {
-            switch ( i >> 4 ) {  /* Switch on current round */
-                case 0:
-                    F = MD5_F(curr[MD5_B], curr[MD5_C], curr[MD5_D]);
-                    g = i;
-                    break;
-                case 1:
-                    F = MD5_G(curr[MD5_B], curr[MD5_C], curr[MD5_D]);
-                    g = (5 * i + 1) % 16;
-                    break;
-                case 2:
-                    F = MD5_H(curr[MD5_B], curr[MD5_C], curr[MD5_D]);
-                    g = (3 * i + 5) % 16;
-                    break;
-                case 3:
-                    F = MD5_I(curr[MD5_B], curr[MD5_C], curr[MD5_D]);
-                    g = (7 * i) % 16;
-                    break;
-                default:
-                    break;
+            #pragma omp simd
+            for (part = 0; part < MD5_HASH_SIZE; ++part) {
+                curr[part] = ctx->hash[part];
             }
 
-            F += curr[MD5_A] + K[i] + (*M)[g];
-            curr[MD5_A] = curr[MD5_D];
-            curr[MD5_D] = curr[MD5_C];
-            curr[MD5_C] = curr[MD5_B];
-            curr[MD5_B] = curr[MD5_B] + MD5_LEFT_ROTATE(F, shift_amounts[i]);
-        }
+            for (i = 0; i < 64; ++i) {
+                switch (i >> 4) {  /* Switch on current round */
+                    case 0:
+                        F = MD5_F(curr[MD5_B], curr[MD5_C], curr[MD5_D]);
+                        g = i;
+                        break;
+                    case 1:
+                        F = MD5_G(curr[MD5_B], curr[MD5_C], curr[MD5_D]);
+                        g = (5 * i + 1) % 16;
+                        break;
+                    case 2:
+                        F = MD5_H(curr[MD5_B], curr[MD5_C], curr[MD5_D]);
+                        g = (3 * i + 5) % 16;
+                        break;
+                    case 3:
+                        F = MD5_I(curr[MD5_B], curr[MD5_C], curr[MD5_D]);
+                        g = (7 * i) % 16;
+                        break;
+                    default:
+                        break;
+                }
 
-        #pragma omp simd
-        for (part = 0; part < MD5_HASH_SIZE; ++part) {
-            ctx->hash[part] += curr[part];
+                F += curr[MD5_A] + K[i] + (*M)[g];
+                curr[MD5_A] = curr[MD5_D];
+                curr[MD5_D] = curr[MD5_C];
+                curr[MD5_C] = curr[MD5_B];
+                curr[MD5_B] = curr[MD5_B] + MD5_LEFT_ROTATE(F, shift_amounts[i]);
+            }
+
+            #pragma omp simd
+            for (part = 0; part < MD5_HASH_SIZE; ++part) {
+                ctx->hash[part] += curr[part];
+            }
         }
 
         g_byte_array_free(chunk, TRUE);
