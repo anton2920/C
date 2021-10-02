@@ -1,6 +1,6 @@
 #include "md5.h"
 
-
+/* MD5 constants */
 #define MD5_HASH_CHUNK_SIZE         (512 / 8)
 #define MD5_HASH_CHUNK_DATA_SIZE    (448 / 8)
 
@@ -10,11 +10,8 @@
 #define MD5_H(B, C, D) ((B) ^ (C) ^ (D))
 #define MD5_I(B, C, D) ((C) ^ ((B) | (~(D))))
 
-
-static inline guint32 md5_left_rotate(guint32 number, guint32 count)
-{
-    return (number << count) | (number >> ((sizeof(number) * 8) - count));
-}
+/* MD5 misc. */
+#define MD5_LEFT_ROTATE(n, c) (((n) << (c)) | ((n) >> ((sizeof((n)) * 8) - (c))))
 
 
 static GByteArray *md5_hash_get_chunk(md5_hash_ctx_t *ctx, const guint8 *data, gsize max_len, gsize *pos)
@@ -135,7 +132,7 @@ void md5_hash_update(md5_hash_ctx_t *ctx, const guint8 *data, gssize len)
             A = D;
             D = C;
             C = B;
-            B = B + md5_left_rotate(F, shift_amounts[i]);
+            B = B + MD5_LEFT_ROTATE(F, shift_amounts[i]);
         }
 
         ctx->a += A;
