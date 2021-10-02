@@ -90,21 +90,19 @@ void md5_hash_update(md5_hash_ctx_t *ctx, const guint8 *data, gssize len)
                                  0x655b59c3, 0x8f0ccc92, 0xffeff47d, 0x85845dd1,
                                  0x6fa87e4f, 0xfe2ce6e0, 0xa3014314, 0x4e0811a1,
                                  0xf7537e82, 0xbd3af235, 0x2ad7d2bb, 0xeb86d391 };
-    guint32 M[16];
+    guint32 (*M)[16];
     guint32 A, B, C, D;
     guint32 i, F, g;
 
     /* Other variables */
     GByteArray *chunk = NULL;
-    gsize pos;
+    gsize pos = 0;
 
     g_assert_nonnull(data);
 
-    pos = 0;
     do {
         chunk = md5_hash_get_chunk(ctx, data, len, &pos);
-        g_assert(chunk->len == sizeof(M));
-        memcpy(M, chunk->data, sizeof(M));
+        M = (guint32 (*)[16]) chunk->data;
 
         A = ctx->a;
         B = ctx->b;
@@ -133,7 +131,7 @@ void md5_hash_update(md5_hash_ctx_t *ctx, const guint8 *data, gssize len)
                     break;
             }
 
-            F += A + K[i] + M[g];
+            F += A + K[i] + (*M)[g];
             A = D;
             D = C;
             C = B;
@@ -147,20 +145,19 @@ void md5_hash_update(md5_hash_ctx_t *ctx, const guint8 *data, gssize len)
 
         g_byte_array_free(chunk, TRUE);
     } while (pos < len);
-
-    /* Updating hexdigest */
-    g_snprintf(ctx->hexdigest, sizeof(ctx->hexdigest),
-               "%.8x%.8x%.8x%.8x",
-               GUINT32_SWAP_LE_BE(ctx->a),
-               GUINT32_SWAP_LE_BE(ctx->b),
-               GUINT32_SWAP_LE_BE(ctx->c),
-               GUINT32_SWAP_LE_BE(ctx->d));
 }
 
 
 const gchar *md5_hash_get_hexdigest(md5_hash_ctx_t *ctx)
 {
     g_assert_nonnull(ctx);
+
+    g_snprintf(ctx->hexdigest, sizeof(ctx->hexdigest),
+               "%.8x%.8x%.8x%.8x",
+               GUINT32_SWAP_LE_BE(ctx->a),
+               GUINT32_SWAP_LE_BE(ctx->b),
+               GUINT32_SWAP_LE_BE(ctx->c),
+               GUINT32_SWAP_LE_BE(ctx->d));
 
     return ctx->hexdigest;
 }
