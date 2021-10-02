@@ -7,11 +7,17 @@
 #define MD5_HEXDIGEST_SIZE (32 + sizeof('\0'))
 
 
+enum {
+    MD5_A,
+    MD5_B,
+    MD5_C,
+    MD5_D,
+    MD5_HASH_SIZE
+};
+
+
 typedef struct _md5_hash_ctx {
-    guint32 a;
-    guint32 b;
-    guint32 c;
-    guint32 d;
+    guint32 hash[MD5_HASH_SIZE];
     guint64 total_bytes;
     gchar   hexdigest[MD5_HEXDIGEST_SIZE];
 } md5_hash_ctx_t;
