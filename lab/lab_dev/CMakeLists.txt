@@ -5,7 +5,7 @@ enable_language(ASM)
 
 set(CMAKE_C_STANDARD 90)
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fopenmp")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -fopenmp")
 
 # Finding GLib
 find_package(PkgConfig REQUIRED)

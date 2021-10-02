@@ -14,7 +14,7 @@
 #define MD5_LEFT_ROTATE(n, c) (((n) << (c)) | ((n) >> ((sizeof((n)) * 8) - (c))))
 
 
-static GByteArray *md5_hash_get_chunk(md5_hash_ctx_t *ctx, const guint8 *data, gsize max_len, gsize *pos)
+static inline GByteArray *md5_hash_get_chunk(md5_hash_ctx_t *ctx, const guint8 *data, gsize max_len, gsize *pos)
 {
     GByteArray *chunk;
     guint64 chunk_len;
@@ -52,7 +52,7 @@ static GByteArray *md5_hash_get_chunk(md5_hash_ctx_t *ctx, const guint8 *data, g
 }
 
 
-void md5_hash_ctx_init(md5_hash_ctx_t *ctx)
+inline void md5_hash_ctx_init(md5_hash_ctx_t *ctx)
 {
     g_assert_nonnull(ctx);
 
