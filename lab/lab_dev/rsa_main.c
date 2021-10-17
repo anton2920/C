@@ -1,0 +1,6 @@
+#include <glib.h>
+
+main()
+{
+
+}
