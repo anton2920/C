@@ -4,7 +4,7 @@
 #include "md5.h"
 
 
-#define FILE_NAME    ("/home/anton/Downloads/android-studio-2020.3.1.24-linux.tar.gz")
+#define FILE_NAME    ("test.txt")
 #define SIZE_TO_READ (4194304) /* 4MiB */
 
 
