@@ -40,6 +40,11 @@ target_include_directories(crypto_caesar_athens PUBLIC ${GLIB_INCLUDE_DIRS})
 target_link_directories(crypto_caesar_athens PUBLIC ${GLIB_INCLUDE_DIRS})
 target_link_libraries(crypto_caesar_athens PkgConfig::GLIB)
 
+add_library(crypto_gamma MODULE ciphers/crypto_gamma.c ciphers/crypto_gamma.h)
+target_include_directories(crypto_gamma PUBLIC ${GLIB_INCLUDE_DIRS})
+target_link_directories(crypto_gamma PUBLIC ${GLIB_INCLUDE_DIRS})
+target_link_libraries(crypto_gamma PkgConfig::GLIB)
+
 set(LIB_CRACK_CMDLINE crack/crack_cmdline.c crack/crack_cmdline.h)
 set(LIB_CRACK_PROCESS crack/crack_process.c crack/crack_process.h)
 
