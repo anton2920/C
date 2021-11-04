@@ -48,6 +48,7 @@ int main(int argc, const char *argv[])
             printf("[client #%d]: server returned error status (it's most likely terminated)\n", client_id);
             break;
         }
+        usleep(rand % 100);
     }
 
     return 0;

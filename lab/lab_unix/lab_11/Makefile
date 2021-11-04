@@ -1,8 +1,6 @@
 # Initializing variables
-export QNX_HOST=/usr/qnx632/host/qnx6/x86/
-export QNX_TARGET=/usr/qnx632/target/qnx6/
-
-CFLAGS = -Wall -O2 -I/usr/include
+CC = gcc
+CFLAGS = -Wall -Wextra -std=c90 -O2
 LDFLAGS =
 
 # Main part
