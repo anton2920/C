@@ -1,10 +1,5 @@
-#include <assert.h>
-#include <stdio.h>
 #include <stdlib.h>
-#include <pthread.h>
 #include <string.h>
-#include <spawn.h>
-#include <signal.h>
 #include <unistd.h>
 
 
