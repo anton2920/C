@@ -64,3 +64,4 @@ add_executable(rsa_main rsa.c rsa.h rsa_main.c)
 target_include_directories(rsa_main PUBLIC ${GLIB_INCLUDE_DIRS})
 target_link_directories(rsa_main PUBLIC ${GLIB_INCLUDE_DIRS})
 target_link_libraries(rsa_main PkgConfig::GLIB gmp)
+
