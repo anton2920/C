@@ -17,7 +17,7 @@
 
 const char *prompt = "tushino> ";
 
-int get_command(char *buffer, size_t buflen, FILE *src);
+int get_command(char *buffer, size_t buflen);
 void dummy_handler(int signum);
 
 main()
@@ -30,7 +30,7 @@ main()
 
     /* Main part */
     for ( ;; ) {
-        rv = get_command(command, sizeof(command), stdin);
+        rv = get_command(command, sizeof(command));
         if (rv == EOF || !strcmp(command, "exit")) {
             if (rv == EOF) {
                 putchar('\n');
@@ -48,16 +48,14 @@ main()
     }
 }
 
-int get_command(char *buffer, size_t buflen, FILE *src)
+int get_command(char *buffer, size_t buflen)
 {
     /* Initializing variables */
     char *rv;
 
     /* I/O flow */
-    if (src == stdin) {
-        fputs(prompt, stdout);
-    }
-    rv = fgets(buffer, buflen, src);
+    fputs(prompt, stdout);
+    rv = fgets(buffer, buflen, stdin);
     *(buffer + strlen(buffer) - 1) = '\0';
 
     return (rv == NULL) ? EOF : 0;

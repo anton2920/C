@@ -8,12 +8,15 @@
 #include "alu.h"
 #include "pc.h"
 
+
 #define INSTR(x, op) ((x << 4) | op)
 
 void output(reg_t *out);
 void read_ram(const char *program, ram_t *ram);
 
-int main(int argc, const char *argv[]) {
+
+int main(int argc, const char *argv[])
+{
 
     /* Initializing variables */
     auto uint8_t bus = 0;
@@ -42,8 +45,9 @@ int main(int argc, const char *argv[]) {
 
     auto uint8_t cu_index;
 
-    auto bool *ctrl_map[] = {&halt_flag, &ma.RWB, &ram.RWB, &ram.OE, &ir.RWB, &ir.OE, &out.RWB,
-                                         &alu.OE, alu.ctrl + 1, alu.ctrl, &b.RWB, &a.RWB, &a.OE, &pc.CE, &pc.CO, &pc.J, &flags.RWB};
+    auto bool *ctrl_map[] = { &halt_flag, &ma.RWB, &ram.RWB, &ram.OE, &ir.RWB, &ir.OE, &out.RWB,
+                              &alu.OE, alu.ctrl + 1, alu.ctrl, &b.RWB, &a.RWB, &a.OE, &pc.CE, &pc.CO, &pc.J,
+                              &flags.RWB };
 
     /* Main part */
     microcode(&cu);
@@ -69,7 +73,7 @@ int main(int argc, const char *argv[]) {
         read_ram(argv[1], &ram);
     }
 
-    for ( ; !halt_flag; clock = !clock, bus = 0) {
+    for (; !halt_flag; clock = !clock, bus = 0) {
 
         /* Set up control pins */
         if (!clock) {
@@ -144,18 +148,23 @@ bus_read:
     return 0;
 }
 
-void output(reg_t *out) {
+
+void output(reg_t *out)
+{
 
     /* I/O flow */
     printf("Octal: %o\tSigned: %d\tUnsigned: %u \tHex: %x\n", out->data, out->data, out->data, out->data);
 }
+
 
 enum THL_BIN {
     HEADER_SIZE = 0x4,
     PROGRAM_SIZE = RAM_SIZE
 };
 
-void read_ram(const char *program, ram_t *ram) {
+
+void read_ram(const char *program, ram_t *ram)
+{
 
     /* Initializing variables */
     char header[HEADER_SIZE];
@@ -170,7 +179,7 @@ void read_ram(const char *program, ram_t *ram) {
 
     fseek(fp, 0x0, SEEK_END);
     len = ftell(fp);
-    if (len != 0x14) {
+    if (len != HEADER_SIZE + PROGRAM_SIZE) {
         fprintf(stderr, "THL-1: program must be 16 bytes long\n");
         exit(2);
     }

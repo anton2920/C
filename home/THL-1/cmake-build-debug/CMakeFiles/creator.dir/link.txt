@@ -1,1 +1,1 @@
-/usr/bin/cc -g   CMakeFiles/creator.dir/prog_creator.c.o  -o creator 
+/usr/bin/cc -g CMakeFiles/creator.dir/prog_creator.c.o -o creator 

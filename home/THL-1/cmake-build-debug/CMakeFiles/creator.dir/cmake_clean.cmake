@@ -1,5 +1,6 @@
 file(REMOVE_RECURSE
   "CMakeFiles/creator.dir/prog_creator.c.o"
+  "CMakeFiles/creator.dir/prog_creator.c.o.d"
   "creator"
   "creator.pdb"
 )

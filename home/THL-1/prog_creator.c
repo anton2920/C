@@ -33,7 +33,7 @@ int main() {
 
     /* I/O flow */
     fwrite(header, 1, 0x4, prog);
-    fwrite(data, 1, 1 << 4, prog);
+    fwrite(data, 1, sizeof(data), prog);
 
     /* Main part */
     fclose(prog);

@@ -27,42 +27,6 @@
 					<DistClean command="/usr/bin/gmake -j8 -f &quot;/home/anton/C/home/THL-1/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
-			<Target title="THL_1">
-				<Option output="/home/anton/C/home/THL-1/cmake-build-debug/THL_1" prefix_auto="0" extension_auto="0"/>
-				<Option working_dir="/home/anton/C/home/THL-1/cmake-build-debug"/>
-				<Option object_output="./"/>
-				<Option type="1"/>
-				<Option compiler="gcc"/>
-				<Compiler>
-					<Add directory="/usr/lib/gcc/x86_64-redhat-linux/8/include"/>
-					<Add directory="/usr/local/include"/>
-					<Add directory="/usr/include"/>
-				</Compiler>
-				<MakeCommands>
-					<Build command="/usr/bin/gmake -j8 -f &quot;/home/anton/C/home/THL-1/cmake-build-debug/Makefile&quot;  VERBOSE=1 THL_1"/>
-					<CompileFile command="/usr/bin/gmake -j8 -f &quot;/home/anton/C/home/THL-1/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="/usr/bin/gmake -j8 -f &quot;/home/anton/C/home/THL-1/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="/usr/bin/gmake -j8 -f &quot;/home/anton/C/home/THL-1/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
-				</MakeCommands>
-			</Target>
-			<Target title="THL_1/fast">
-				<Option output="/home/anton/C/home/THL-1/cmake-build-debug/THL_1" prefix_auto="0" extension_auto="0"/>
-				<Option working_dir="/home/anton/C/home/THL-1/cmake-build-debug"/>
-				<Option object_output="./"/>
-				<Option type="1"/>
-				<Option compiler="gcc"/>
-				<Compiler>
-					<Add directory="/usr/lib/gcc/x86_64-redhat-linux/8/include"/>
-					<Add directory="/usr/local/include"/>
-					<Add directory="/usr/include"/>
-				</Compiler>
-				<MakeCommands>
-					<Build command="/usr/bin/gmake -j8 -f &quot;/home/anton/C/home/THL-1/cmake-build-debug/Makefile&quot;  VERBOSE=1 THL_1/fast"/>
-					<CompileFile command="/usr/bin/gmake -j8 -f &quot;/home/anton/C/home/THL-1/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="/usr/bin/gmake -j8 -f &quot;/home/anton/C/home/THL-1/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="/usr/bin/gmake -j8 -f &quot;/home/anton/C/home/THL-1/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
-				</MakeCommands>
-			</Target>
 			<Target title="edit_cache">
 				<Option working_dir="/home/anton/C/home/THL-1/cmake-build-debug"/>
 				<Option type="4"/>
@@ -104,6 +68,42 @@
 				</Compiler>
 				<MakeCommands>
 					<Build command="/usr/bin/gmake -j8 -f &quot;/home/anton/C/home/THL-1/cmake-build-debug/Makefile&quot;  VERBOSE=1 creator/fast"/>
+					<CompileFile command="/usr/bin/gmake -j8 -f &quot;/home/anton/C/home/THL-1/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j8 -f &quot;/home/anton/C/home/THL-1/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j8 -f &quot;/home/anton/C/home/THL-1/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="THL_1">
+				<Option output="/home/anton/C/home/THL-1/cmake-build-debug/THL_1" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/anton/C/home/THL-1/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/usr/lib/gcc/x86_64-redhat-linux/8/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/gmake -j8 -f &quot;/home/anton/C/home/THL-1/cmake-build-debug/Makefile&quot;  VERBOSE=1 THL_1"/>
+					<CompileFile command="/usr/bin/gmake -j8 -f &quot;/home/anton/C/home/THL-1/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j8 -f &quot;/home/anton/C/home/THL-1/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j8 -f &quot;/home/anton/C/home/THL-1/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="THL_1/fast">
+				<Option output="/home/anton/C/home/THL-1/cmake-build-debug/THL_1" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/anton/C/home/THL-1/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/usr/lib/gcc/x86_64-redhat-linux/8/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/gmake -j8 -f &quot;/home/anton/C/home/THL-1/cmake-build-debug/Makefile&quot;  VERBOSE=1 THL_1/fast"/>
 					<CompileFile command="/usr/bin/gmake -j8 -f &quot;/home/anton/C/home/THL-1/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
 					<Clean command="/usr/bin/gmake -j8 -f &quot;/home/anton/C/home/THL-1/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 					<DistClean command="/usr/bin/gmake -j8 -f &quot;/home/anton/C/home/THL-1/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>

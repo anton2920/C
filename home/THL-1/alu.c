@@ -18,15 +18,21 @@ uint8_t perform_alu(alu_t *alu, reg_t *flags) {
         case ALU_SUB:
             tmp = alu->a->data + (~alu->b->data + 1);
             res = tmp & 0xFF;
-            flags->data |= ((tmp & 0x100) >> 8);
+            flags->data |= ((tmp & (1 << 8)) >> 8);
             flags->data |= ((tmp == 0) << 1);
             flags->data |= ((tmp < 0) << 2);
             break;
         case ALU_AND:
             res = alu->a->data & alu->b->data;
+            flags->data |= ((tmp & (1 << 8)) >> 8);
+            flags->data |= ((tmp == 0) << 1);
+            flags->data |= ((tmp < 0) << 2);
             break;
         case ALU_OR:
             res = alu->a->data | alu->b->data;
+            flags->data |= ((tmp & (1 << 8)) >> 8);
+            flags->data |= ((tmp == 0) << 1);
+            flags->data |= ((tmp < 0) << 2);
             break;
         default:
             break;
