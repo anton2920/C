@@ -1,1 +1,0 @@
-/usr/bin/cc -m32 -g   CMakeFiles/asm_dev.dir/main.c.o CMakeFiles/asm_dev.dir/asm/asm.asm.o CMakeFiles/asm_dev.dir/libs/test.c.o  -o asm_dev 

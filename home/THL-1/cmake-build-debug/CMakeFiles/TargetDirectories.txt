@@ -1,4 +1,0 @@
-/home/anton/C/home/THL-1/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/home/anton/C/home/THL-1/cmake-build-debug/CMakeFiles/edit_cache.dir
-/home/anton/C/home/THL-1/cmake-build-debug/CMakeFiles/creator.dir
-/home/anton/C/home/THL-1/cmake-build-debug/CMakeFiles/THL_1.dir

@@ -1,1 +1,0 @@
-/usr/bin/cc -fPIC -O3 -DNDEBUG  -shared -Wl,-soname,libSorting.so -o libSorting.so CMakeFiles/Sorting.dir/sorting.c.o CMakeFiles/Sorting.dir/adv_sorting.c.o CMakeFiles/Sorting.dir/compare.c.o CMakeFiles/Sorting.dir/convertions.c.o CMakeFiles/Sorting.dir/others.c.o 

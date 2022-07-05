@@ -1,3 +1,0 @@
-/home/anton/C/home/Max_lab_9/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/home/anton/C/home/Max_lab_9/cmake-build-debug/CMakeFiles/edit_cache.dir
-/home/anton/C/home/Max_lab_9/cmake-build-debug/CMakeFiles/Max_lab_9.dir

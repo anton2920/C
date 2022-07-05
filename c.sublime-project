@@ -4,7 +4,7 @@
 		{
 			"path": ".",
 			// "file_include_patterns": ["*.c*", "*.h*", "*.txt", "*.bin", "*.asm", "*.dat", "Makefile", "*.s", "*.S"],
-			"file_exclude_patterns": ["*.o", "*.out"],
+			// "file_exclude_patterns": ["*.o", "*.out"],
 		}
 	]
 }

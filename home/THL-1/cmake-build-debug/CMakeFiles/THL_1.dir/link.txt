@@ -1,1 +1,0 @@
-/usr/bin/cc -g CMakeFiles/THL_1.dir/main.c.o CMakeFiles/THL_1.dir/alu.c.o CMakeFiles/THL_1.dir/control.c.o -o THL_1 

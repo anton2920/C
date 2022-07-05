@@ -1,1 +1,0 @@
-/usr/bin/cc -g   CMakeFiles/debug.dir/main.c.o CMakeFiles/debug.dir/libs/getch.c.o CMakeFiles/debug.dir/libs/getint.c.o  -o debug 

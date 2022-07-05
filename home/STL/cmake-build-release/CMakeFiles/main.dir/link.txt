@@ -1,1 +1,0 @@
-/usr/bin/cc -O3 -DNDEBUG   CMakeFiles/main.dir/main.c.o  -o main -Wl,-rpath,/home/anton/C/home/STL/cmake-build-release libSTL.so 

@@ -1,1 +1,0 @@
-/usr/bin/cc -O3 -DNDEBUG   CMakeFiles/test_prog.dir/main.c.o  -o test_prog -Wl,-rpath,/home/anton/C/home/Sorting/cmake-build-release libSorting.so -Lcmake-build-debug/ 

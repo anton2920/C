@@ -1,1 +1,0 @@
-/usr/bin/cc -g   CMakeFiles/lab_25_dev.dir/home/anton/C/experiments/Julia/lab_25.c.o  -o lab_25_dev 

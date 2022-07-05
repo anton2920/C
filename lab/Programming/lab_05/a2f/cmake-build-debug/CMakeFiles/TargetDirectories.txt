@@ -1,3 +1,0 @@
-/home/anton/C/lab/lab_05/a2f/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/home/anton/C/lab/lab_05/a2f/cmake-build-debug/CMakeFiles/edit_cache.dir
-/home/anton/C/lab/lab_05/a2f/cmake-build-debug/CMakeFiles/a2f.dir

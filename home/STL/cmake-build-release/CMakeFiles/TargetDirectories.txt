@@ -1,8 +1,0 @@
-/home/anton/C/home/STL/cmake-build-release/CMakeFiles/install/strip.dir
-/home/anton/C/home/STL/cmake-build-release/CMakeFiles/install/local.dir
-/home/anton/C/home/STL/cmake-build-release/CMakeFiles/main.dir
-/home/anton/C/home/STL/cmake-build-release/CMakeFiles/edit_cache.dir
-/home/anton/C/home/STL/cmake-build-release/CMakeFiles/STL.dir
-/home/anton/C/home/STL/cmake-build-release/CMakeFiles/install.dir
-/home/anton/C/home/STL/cmake-build-release/CMakeFiles/rebuild_cache.dir
-/home/anton/C/home/STL/cmake-build-release/CMakeFiles/list_install_components.dir

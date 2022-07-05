@@ -1,1 +1,0 @@
-/usr/bin/cc -g   CMakeFiles/Max_lab_9.dir/main.c.o  -o Max_lab_9 

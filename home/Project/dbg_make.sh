@@ -1,1 +1,0 @@
-cc -std=c90 -Wall -c libs/menu.c && cc -std=c90 -Wall -c libs/menu2.c && cc -std=c90 -Wall -c libs/menu3.c && cc -std=c90 -Wall -c main.c && cc -std=c90 -Wall -c libs/math.c && cc -std=c90 -Wall -c libs/tree2.c && cc -std=c90 -Wall main.o menu.o menu2.o menu3.o math.o tree2.o -o dbg_main -ldialog -lcursesw

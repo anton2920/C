@@ -1,3 +1,0 @@
-/home/anton/C/experiments/LowLevelFile/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/home/anton/C/experiments/LowLevelFile/cmake-build-debug/CMakeFiles/edit_cache.dir
-/home/anton/C/experiments/LowLevelFile/cmake-build-debug/CMakeFiles/LowLevelFile.dir

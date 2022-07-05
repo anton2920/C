@@ -1,4 +1,0 @@
-/home/anton/C/home/Sorting/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/home/anton/C/home/Sorting/cmake-build-debug/CMakeFiles/edit_cache.dir
-/home/anton/C/home/Sorting/cmake-build-debug/CMakeFiles/Sorting.dir
-/home/anton/C/home/Sorting/cmake-build-debug/CMakeFiles/test_prog.dir

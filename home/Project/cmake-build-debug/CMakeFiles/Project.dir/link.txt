@@ -1,1 +1,0 @@
-/usr/bin/cc -g   CMakeFiles/Project.dir/main.c.o CMakeFiles/Project.dir/libs/menu.c.o CMakeFiles/Project.dir/libs/menu2.c.o CMakeFiles/Project.dir/libs/menu3.c.o CMakeFiles/Project.dir/libs/tree.c.o CMakeFiles/Project.dir/libs/math.c.o  -o Project -ldialog -lncurses -lm -lncursesw 
