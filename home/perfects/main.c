@@ -2,9 +2,14 @@
 #include <gmp.h>
 #include <signal.h>
 #include <stdbool.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <sys/time.h>
+
+
+#define P_MAX_BOUND 82589932
+
+
+static bool exitted = false;
 
 
 mpz_ptr get_mersenne(unsigned long p)
@@ -47,11 +52,44 @@ mpz_ptr get_perfect(unsigned long p)
 
 bool is_prime(mpz_ptr num)
 {
-    return true;
+    mpz_t bound, i, tmp;
+    bool result = true;
+
+    assert(num != NULL);
+
+    if (mpz_cmp_ui(num, 1) == 0) {
+        return false;
+    } else if (mpz_cmp_ui(num, 2) == 0) {
+        return true;
+    } else {
+        mpz_init(tmp);
+        mpz_mod_ui(tmp, num, 2);
+        if (mpz_cmp_ui(tmp, 0) == 0) {
+            mpz_clear(tmp);
+            return false;
+        }
+        mpz_clear(tmp);
+    }
+
+    mpz_init(tmp);
+    mpz_init(bound);
+
+    mpz_sqrt(bound, num);
+    for (mpz_init_set_ui(i, 3); (mpz_cmp(i, bound) <= 0) && (!exitted); mpz_add_ui(i, i, 2))
+    {
+        mpz_mod(tmp, num, i);
+        if (mpz_cmp_ui(tmp, 0) == 0) {
+            result = false;
+            break;
+        }
+    }
+
+    mpz_clear(bound);
+    mpz_clear(tmp);
+    mpz_clear(i);
+
+    return (!exitted) ? result : false;
 }
-
-
-static bool exitted = false;
 
 
 void sighandler(int signo)
@@ -70,7 +108,8 @@ int main()
 
     gettimeofday(&start_time, NULL);
 
-    for (p = 2; !exitted; ++p) {
+    #pragma omp parallel for ordered, num_threads(2), default(none), shared(exitted, start_time)
+    for (p = 2; p < P_MAX_BOUND; ++p) {
         mpz_ptr num = get_mersenne(p);
         assert(num != NULL);
 
@@ -89,6 +128,10 @@ int main()
         }
         mpz_clear(num);
         free(num);
+
+        if (exitted) {
+            p = P_MAX_BOUND;
+        }
     }
 
     return 0;
