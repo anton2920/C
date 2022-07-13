@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <gmp.h>
+#include <omp.h>
 #include <signal.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -75,8 +76,7 @@ bool is_prime(mpz_ptr num)
     mpz_init(bound);
 
     mpz_sqrt(bound, num);
-    for (mpz_init_set_ui(i, 3); (mpz_cmp(i, bound) <= 0) && (!exitted); mpz_add_ui(i, i, 2))
-    {
+    for (mpz_init_set_ui(i, 3); (mpz_cmp(i, bound) <= 0) && (!exitted); mpz_add_ui(i, i, 2)) {
         mpz_mod(tmp, num, i);
         if (mpz_cmp_ui(tmp, 0) == 0) {
             result = false;
@@ -108,7 +108,7 @@ int main()
 
     gettimeofday(&start_time, NULL);
 
-    #pragma omp parallel for ordered, num_threads(2), default(none), shared(exitted, start_time)
+#pragma omp parallel for num_threads(4), schedule(static, 1), default(none), shared(exitted, start_time)
     for (p = 2; p < P_MAX_BOUND; ++p) {
         mpz_ptr num = get_mersenne(p);
         assert(num != NULL);
@@ -119,7 +119,8 @@ int main()
             assert(perfect_number != NULL);
 
             gettimeofday(&end_time, NULL);
-            gmp_printf("[%lu][%Zd] Time is %lf\n", p, perfect_number,
+#pragma omp critical
+            gmp_printf("[TID=%d][P=%lu][PN=%Zd] Time is %lf\n", omp_get_thread_num(), p, perfect_number,
                        (end_time.tv_sec + (double) end_time.tv_usec / 1000000) -
                        (start_time.tv_sec + (double) start_time.tv_usec / 1000000));
 
