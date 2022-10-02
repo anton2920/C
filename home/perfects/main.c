@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <gmp.h>
+#include <math.h>
 #include <omp.h>
 #include <signal.h>
 #include <stdbool.h>
@@ -52,7 +53,6 @@ bool is_definitely_prime(mpz_ptr num)
 {
     bool result = true;
     mpz_t bound, i;
-    int first_bit;
 
     assert(num != NULL);
 
@@ -60,11 +60,8 @@ bool is_definitely_prime(mpz_ptr num)
         return false;
     } else if (mpz_cmp_ui(num, 2) == 0) {
         return true;
-    } else {
-        first_bit = mpz_tstbit(num, 0);
-        if (first_bit == 0) {
-            return false;
-        }
+    } else if (mpz_tstbit(num, 0) == 0) {
+        return false;
     }
 
     mpz_init(bound);
@@ -104,6 +101,29 @@ bool is_prime(mpz_ptr num)
 }
 
 
+bool is_prime_ul(unsigned long num)
+{
+    unsigned long bound, i;
+
+    if (num == 1) {
+        return false;
+    } else if (num == 2) {
+        return true;
+    } else if ((num & 1) == 0) {
+        return false;
+    }
+
+    bound = (unsigned long) sqrt((double) num);
+    for (i = 3; i < bound; i += 2) {
+        if (num % i == 0) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+
 void sighandler(int signo)
 {
     exit(0);
@@ -122,27 +142,29 @@ int main()
 
 #pragma omp parallel for num_threads(8), schedule(static, 1), default(none), shared(start_time)
     for (p = 2; p < P_MAX_BOUND; ++p) {
-        mpz_ptr num = get_mersenne(p);
-        assert(num != NULL);
+        if (is_prime_ul(p)) {
+            mpz_ptr num = get_mersenne(p);
+            assert(num != NULL);
 
-        if (is_prime(num)) {
-            struct timeval end_time;
-            mpz_ptr perfect_number = get_perfect(p);
-            assert(perfect_number != NULL);
+            if (is_prime(num)) {
+                struct timeval end_time;
+                mpz_ptr perfect_number = get_perfect(p);
+                assert(perfect_number != NULL);
 
-            gettimeofday(&end_time, NULL);
+                gettimeofday(&end_time, NULL);
 #pragma omp critical
-            {
-                gmp_printf("[TID=%d][P=%lu][PN=%Zd] Time is %lf\n", omp_get_thread_num(), p, perfect_number,
-                           (end_time.tv_sec + (double) end_time.tv_usec / 1000000) -
-                           (start_time.tv_sec + (double) start_time.tv_usec / 1000000));
-            }
+                {
+                    gmp_printf("[TID=%d][P=%lu][PN=%Zd] Time is %lf\n", omp_get_thread_num(), p, perfect_number,
+                               (end_time.tv_sec + (double) end_time.tv_usec / 1000000) -
+                               (start_time.tv_sec + (double) start_time.tv_usec / 1000000));
+                }
 
-            mpz_clear(perfect_number);
-            free(perfect_number);
+                mpz_clear(perfect_number);
+                free(perfect_number);
+            }
+            mpz_clear(num);
+            free(num);
         }
-        mpz_clear(num);
-        free(num);
     }
 
     return 0;

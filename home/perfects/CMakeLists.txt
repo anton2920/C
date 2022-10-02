@@ -7,4 +7,4 @@ set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O2 -fopenmp")
 
 add_executable(perfects main.c)
-target_link_libraries(perfects gmp)
+target_link_libraries(perfects gmp m)
